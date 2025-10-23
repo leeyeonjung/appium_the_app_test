@@ -135,8 +135,13 @@ appium_the_app/
 | **Jenkins URL** | 🔗 [http://3.36.219.242:8080](http://3.36.219.242:8080) |
 | **User ID** | `guest` |
 | **Password** | `guest` |
-| **Trigger** | GitHub Push 이벤트를 감지하여, jenkins_test_repo 디렉터리 및 하위 파일에 변경이 발생하면 테스트 코드 실행이 자동으로 트리거 |
 | **Execution Flow** | Jenkins → Remote Windows (pytest 실행) → 로컬 환경에서 생성된 HTML Report 수집 → Jenkins에서 표시 |
+| **Trigger** | GitHub Push 이벤트를 감지하여, jenkins_test_repo 디렉터리 및 하위 파일에 변경이 발생하면 테스트 코드 실행이 자동으로 트리거 |
+
+### 🤖 Git webhook 설정
+<img width="441" height="250" alt="image" src="https://github.com/user-attachments/assets/941e7bcd-4271-4f42-9563-adcfd6608ff2" />
+
+
 
 ### 🎥 Jenkins Test Demo
 
