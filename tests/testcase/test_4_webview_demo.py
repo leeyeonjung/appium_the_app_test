@@ -1,247 +1,119 @@
+# tests/testcase/test_4_webview_demo.py
 # Standard library
-import logging
 from time import sleep
-from selenium.webdriver.common.by import By
-from appium.webdriver.common.appiumby import AppiumBy
 
 # Third-party libraries
 import pytest_check as check
 
-log = logging.getLogger()
+# Local modules
+from tests.src.pages.webview_demo import WebviewDemoPage
 
 
 def test_webview_demo_placeholder(wd):
-
-    # Webview Demo 화면 진입
-    wd.find_element(By.XPATH, '(//android.view.ViewGroup[@resource-id="RNE__LISTITEM__padView"])[4]').click()
-
-    # 입력창 element 지정
-    inputfield = wd.find_element(AppiumBy.ACCESSIBILITY_ID, "urlInput")
-
-    # Assertion: placeholder 값이 "https://appiumpro.com"임
-    check.equal(inputfield.text, "https://appiumpro.com")
+    """Webview Demo 입력창 placeholder 확인"""
+    page = WebviewDemoPage(wd)
+    page.open_webview_demo()
+    placeholder = page.get_placeholder_text()
+    check.equal(placeholder, "https://appiumpro.com")
 
 
 def test_webview_context(wd):
-
-    # Webview Demo 화면 진입
-    wd.find_element(By.XPATH, '(//android.view.ViewGroup[@resource-id="RNE__LISTITEM__padView"])[4]').click()
-
-    # url 입력 필드에 주소 입력
-    inputfield = wd.find_element(AppiumBy.ACCESSIBILITY_ID, "urlInput")
-    inputfield.send_keys("https://appiumpro.com")
-
-    # Go 버튼 클릭
-    go_button = wd.find_element(AppiumBy.ACCESSIBILITY_ID, "navigateBtn")
-    go_button.click()
-
-    # context를 webview로 전환
-    wd.switch_to.context("WEBVIEW_com.appiumpro.the_app")
-
-    # Assertion: 현재 driver context가 "WEBVIEW_com.appiumpro.the_app"임
+    """Webview 전환 후 context 이름 확인"""
+    page = WebviewDemoPage(wd)
+    page.open_webview_demo()
+    page.input_url("https://appiumpro.com")
+    page.click_go_button()
+    page.switch_to_webview()
     check.equal(wd.current_context, "WEBVIEW_com.appiumpro.the_app")
 
 
 def test_get_certified(wd):
-
-    # Webview Demo 화면 진입
-    wd.find_element(By.XPATH, '(//android.view.ViewGroup[@resource-id="RNE__LISTITEM__padView"])[4]').click()
-
-    # url 입력 필드에 주소 입력
-    inputfield = wd.find_element(AppiumBy.ACCESSIBILITY_ID, "urlInput")
-    inputfield.send_keys("https://appiumpro.com")
-
-    # Go 버튼 클릭
-    go_button = wd.find_element(AppiumBy.ACCESSIBILITY_ID, "navigateBtn")
-    go_button.click()
-
-    # context를 webview로 전환
-    wd.switch_to.context("WEBVIEW_com.appiumpro.the_app")
-
-    # 햄버거 바 클릭
-    wd.find_element(By.XPATH, '/html/body/div/div/div[2]/div/div/a/img').click()
-
-    # Get Certified 메뉴 선택
-    wd.find_element(By.XPATH, '/html/body/div/div/div[2]/div/ul/li[1]/a').click()
-
-    # 타이틀 텍스트 가져오기
-    title = wd.find_element(By.XPATH, '/html/body/div/div/div[3]/h1').text
-
-    # Assertion: title이 'Appium Pro Training, Tutorials, and Certification'임
+    """‘Get Certified’ 메뉴 진입 및 타이틀 확인"""
+    page = WebviewDemoPage(wd)
+    page.open_webview_demo()
+    page.input_url("https://appiumpro.com")
+    page.click_go_button()
+    page.switch_to_webview()
+    page.click_hamburger()
+    page.click_menu_by_name("get_certified")
+    title = page.get_title_text()
     check.equal(title, 'Appium Pro Training, Tutorials, and Certification')
 
 
 def test_subscribe(wd):
-
-    # Webview Demo 화면 진입
-    wd.find_element(By.XPATH, '(//android.view.ViewGroup[@resource-id="RNE__LISTITEM__padView"])[4]').click()
-
-    # url 입력 필드에 주소 입력
-    inputfield = wd.find_element(AppiumBy.ACCESSIBILITY_ID, "urlInput")
-    inputfield.send_keys("https://appiumpro.com")
-
-    # Go 버튼 클릭
-    go_button = wd.find_element(AppiumBy.ACCESSIBILITY_ID, "navigateBtn")
-    go_button.click()
-
-    # context를 webview로 전환
-    wd.switch_to.context("WEBVIEW_com.appiumpro.the_app")
-
-    # 햄버거 바 클릭
-    wd.find_element(By.XPATH, '/html/body/div/div/div[2]/div/div/a/img').click()
-
-    # Subscribe 메뉴 선택
-    wd.find_element(By.XPATH, '/html/body/div/div/div[2]/div/ul/li[2]/a').click()
-
-    # 타이틀 텍스트 가져오기
-    title = wd.find_element(By.XPATH, '/html/body/div/div/div[3]/h1').text
-
-    # Assertion: title이 'Subscribe Now'임
+    """‘Subscribe’ 메뉴 진입 및 타이틀 확인"""
+    page = WebviewDemoPage(wd)
+    page.open_webview_demo()
+    page.input_url("https://appiumpro.com")
+    page.click_go_button()
+    page.switch_to_webview()
+    page.click_hamburger()
+    page.click_menu_by_name("subscribe")
+    title = page.get_title_text()
     check.equal(title, 'Subscribe Now')
 
 
 def test_latest(wd):
-
-    # Webview Demo 화면 진입
-    wd.find_element(By.XPATH, '(//android.view.ViewGroup[@resource-id="RNE__LISTITEM__padView"])[4]').click()
-
-    # url 입력 필드에 주소 입력
-    inputfield = wd.find_element(AppiumBy.ACCESSIBILITY_ID, "urlInput")
-    inputfield.send_keys("https://appiumpro.com")
-
-    # Go 버튼 클릭
-    go_button = wd.find_element(AppiumBy.ACCESSIBILITY_ID, "navigateBtn")
-    go_button.click()
-
-    # context를 webview로 전환
-    wd.switch_to.context("WEBVIEW_com.appiumpro.the_app")
-
-    # 햄버거 바 클릭
-    wd.find_element(By.XPATH, '/html/body/div/div/div[2]/div/div/a/img').click()
-
-    # Latest 메뉴 선택
-    wd.find_element(By.XPATH, '/html/body/div/div/div[2]/div/ul/li[3]/a').click()
-
-    sleep(1.0)
-
-    # 타이틀 텍스트 가져오기
-    title = wd.find_element(By.XPATH, '/html/body/div/div/div[3]/h1').text
-
-    # Assertion: title이 'Edition 124'임
+    """‘Latest’ 메뉴 진입 및 타이틀 확인"""
+    page = WebviewDemoPage(wd)
+    page.open_webview_demo()
+    page.input_url("https://appiumpro.com")
+    page.click_go_button()
+    page.switch_to_webview()
+    page.click_hamburger()
+    page.click_menu_by_name("latest")
+    sleep(1)
+    title = page.get_title_text()
     check.equal(title, 'Edition 124')
 
 
 def test_all_editions(wd):
-
-    # Webview Demo 화면 진입
-    wd.find_element(By.XPATH, '(//android.view.ViewGroup[@resource-id="RNE__LISTITEM__padView"])[4]').click()
-
-    # url 입력 필드에 주소 입력
-    inputfield = wd.find_element(AppiumBy.ACCESSIBILITY_ID, "urlInput")
-    inputfield.send_keys("https://appiumpro.com")
-
-    # Go 버튼 클릭
-    go_button = wd.find_element(AppiumBy.ACCESSIBILITY_ID, "navigateBtn")
-    go_button.click()
-
-    # context를 webview로 전환
-    wd.switch_to.context("WEBVIEW_com.appiumpro.the_app")
-
-    # 햄버거 바 클릭
-    wd.find_element(By.XPATH, '/html/body/div/div/div[2]/div/div/a/img').click()
-
-    # All Editions 메뉴 선택
-    wd.find_element(By.XPATH, '/html/body/div/div/div[2]/div/ul/li[4]/a').click()
-
-    # 타이틀 텍스트 가져오기
-    title = wd.find_element(By.XPATH, '/html/body/div/div/div[3]/h1').text
-
-    # Assertion: title이 'All Editions'임
+    """‘All Editions’ 메뉴 진입 및 타이틀 확인"""
+    page = WebviewDemoPage(wd)
+    page.open_webview_demo()
+    page.input_url("https://appiumpro.com")
+    page.click_go_button()
+    page.switch_to_webview()
+    page.click_hamburger()
+    page.click_menu_by_name("all_editions")
+    title = page.get_title_text()
     check.equal(title, 'All Editions')
 
 
 def test_sponsors(wd):
-
-    # Webview Demo 화면 진입
-    wd.find_element(By.XPATH, '(//android.view.ViewGroup[@resource-id="RNE__LISTITEM__padView"])[4]').click()
-
-    # url 입력 필드에 주소 입력
-    inputfield = wd.find_element(AppiumBy.ACCESSIBILITY_ID, "urlInput")
-    inputfield.send_keys("https://appiumpro.com")
-
-    # Go 버튼 클릭
-    go_button = wd.find_element(AppiumBy.ACCESSIBILITY_ID, "navigateBtn")
-    go_button.click()
-
-    # context를 webview로 전환
-    wd.switch_to.context("WEBVIEW_com.appiumpro.the_app")
-
-    # 햄버거 바 클릭
-    wd.find_element(By.XPATH, '/html/body/div/div/div[2]/div/div/a/img').click()
-
-    # Sponsors 메뉴 선택
-    wd.find_element(By.XPATH, '/html/body/div/div/div[2]/div/ul/li[5]/a').click()
-
-    # 타이틀 텍스트 가져오기
-    title = wd.find_element(By.XPATH, '/html/body/div/div/div[3]/h1').text
-
-    # Assertion: title이 'Sponsors'임
+    """‘Sponsors’ 메뉴 진입 및 타이틀 확인"""
+    page = WebviewDemoPage(wd)
+    page.open_webview_demo()
+    page.input_url("https://appiumpro.com")
+    page.click_go_button()
+    page.switch_to_webview()
+    page.click_hamburger()
+    page.click_menu_by_name("sponsors")
+    title = page.get_title_text()
     check.equal(title, 'Sponsors')
 
 
 def test_contact(wd):
-
-    # Webview Demo 화면 진입
-    wd.find_element(By.XPATH, '(//android.view.ViewGroup[@resource-id="RNE__LISTITEM__padView"])[4]').click()
-
-    # url 입력 필드에 주소 입력
-    inputfield = wd.find_element(AppiumBy.ACCESSIBILITY_ID, "urlInput")
-    inputfield.send_keys("https://appiumpro.com")
-
-    # Go 버튼 클릭
-    go_button = wd.find_element(AppiumBy.ACCESSIBILITY_ID, "navigateBtn")
-    go_button.click()
-
-    # context를 webview로 전환
-    wd.switch_to.context("WEBVIEW_com.appiumpro.the_app")
-
-    # 햄버거 바 클릭
-    wd.find_element(By.XPATH, '/html/body/div/div/div[2]/div/div/a/img').click()
-
-    # Contact 메뉴 선택
-    wd.find_element(By.XPATH, '/html/body/div/div/div[2]/div/ul/li[6]/a').click()
-
-    # 타이틀 텍스트 가져오기
-    title = wd.find_element(By.XPATH, '/html/body/div/div/div[3]/h1').text
-
-    # Assertion: title이 'Contact Us'임
+    """‘Contact’ 메뉴 진입 및 타이틀 확인"""
+    page = WebviewDemoPage(wd)
+    page.open_webview_demo()
+    page.input_url("https://appiumpro.com")
+    page.click_go_button()
+    page.switch_to_webview()
+    page.click_hamburger()
+    page.click_menu_by_name("contact")
+    title = page.get_title_text()
     check.equal(title, 'Contact Us')
 
 
 def test_about(wd):
-    
-    # Webview Demo 화면 진입
-    wd.find_element(By.XPATH, '(//android.view.ViewGroup[@resource-id="RNE__LISTITEM__padView"])[4]').click()
-
-    # url 입력 필드에 주소 입력
-    inputfield = wd.find_element(AppiumBy.ACCESSIBILITY_ID, "urlInput")
-    inputfield.send_keys("https://appiumpro.com")
-
-    # Go 버튼 클릭
-    go_button = wd.find_element(AppiumBy.ACCESSIBILITY_ID, "navigateBtn")
-    go_button.click()
-
-    # context를 webview로 전환
-    wd.switch_to.context("WEBVIEW_com.appiumpro.the_app")
-
-    # 햄버거 바 클릭
-    wd.find_element(By.XPATH, '/html/body/div/div/div[2]/div/div/a/img').click()
-
-    # About 메뉴 선택
-    wd.find_element(By.XPATH, '/html/body/div/div/div[2]/div/ul/li[7]/a').click()
-
-    # 타이틀 텍스트 가져오기
-    title = wd.find_element(By.XPATH, '/html/body/div/div/div[3]/h1').text
-
-    # Assertion: title이 'About'임
+    """‘About’ 메뉴 진입 및 타이틀 확인"""
+    page = WebviewDemoPage(wd)
+    page.open_webview_demo()
+    page.input_url("https://appiumpro.com")
+    page.click_go_button()
+    page.switch_to_webview()
+    page.click_hamburger()
+    page.click_menu_by_name("about")
+    title = page.get_title_text()
     check.equal(title, 'About')

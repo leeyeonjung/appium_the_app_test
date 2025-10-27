@@ -1,99 +1,53 @@
-# Standard library
-import logging
-from time import sleep
-from selenium.webdriver.common.by import By
-from appium.webdriver.common.appiumby import AppiumBy
-
+# tests/testcase/test_1_echo_box.py
 # Third-party libraries
 import pytest_check as check
 
-log = logging.getLogger()
+# Local modules
+from tests.src.pages.echo_box import EchoBoxPage
 
 
 def test_into_echo_box(wd):
-
-    # Echo Box 화면 진입
-    wd.find_element(By.XPATH, '(//android.view.ViewGroup[@resource-id="RNE__LISTITEM__padView"])[1]').click()
-
-    # Action_bar_root 아래 자식 TextView element 지정
-    title = wd.find_element(
-        By.XPATH,
-        '//android.widget.LinearLayout[@resource-id="com.appiumpro.the_app:id/action_bar_root"]//android.widget.TextView'
-    )
-    
-    # Assertion: Title text가 "Echo Screen"임
-    check.equal(title.text, "Echo Screen")
+    """Echo Box 화면 진입 확인"""
+    page = EchoBoxPage(wd)
+    page.open_echo_box()
+    title = page.get_title_text()
+    check.equal(title, "Echo Screen")
 
 
 def test_echo_box_placeholder(wd):
-
-    # Echo Box 화면 진입
-    wd.find_element(By.XPATH, '(//android.view.ViewGroup[@resource-id="RNE__LISTITEM__padView"])[1]').click()
-
-    # 입력창 element 지정
-    inputfield = wd.find_element(AppiumBy.ACCESSIBILITY_ID, "messageInput")
-
-    # Assertion: placeholder 값이 "Say something"임
-    check.equal(inputfield.text, "Say something")
+    """Echo Box 입력창의 placeholder 문구가 “Say something”인지 확인"""
+    page = EchoBoxPage(wd)
+    page.open_echo_box()
+    placeholder = page.get_placeholder_text()
+    check.equal(placeholder, "Say something")
 
 
 def test_inputfield_function_01(wd):
+    """입력한 텍스트가 저장 후 동일하게 표시되는지 확인"""
+    page = EchoBoxPage(wd)
+    page.open_echo_box()
 
-    # Echo Box 화면 진입
-    wd.find_element(By.XPATH, '(//android.view.ViewGroup[@resource-id="RNE__LISTITEM__padView"])[1]').click()
-
-    # 입력할 텍스트 정의
     input_text = "Hello Test1"
+    page.input_message(input_text)
+    page.save_message()
 
-    # 입력창 element 지정
-    inputfield = wd.find_element(AppiumBy.ACCESSIBILITY_ID, "messageInput")
-
-    # 입력창에 텍스트 입력
-    inputfield.send_keys(input_text)
-
-    # 저장 버튼 element 지정
-    saveBtn = wd.find_element(AppiumBy.ACCESSIBILITY_ID, "messageSaveBtn")
-
-    # 저장 버튼 클릭
-    saveBtn.click()
-
-    # 저장 처리 대기 (0.5초)
-    sleep(0.5)
-    
-    # 저장된 메시지 element 지정
-    result = wd.find_element(By.XPATH, "//*[@resource-id='savedMessage']")
-
-    # Assertion: 저장된 메시지가 입력 텍스트와 동일함
-    check.equal(result.text, input_text)
+    saved_text = page.get_saved_message()
+    check.equal(saved_text, input_text)
 
 
 def test_inputfield_function_02(wd):
+    """새 텍스트 입력 시 이전 데이터가 덮어쓰기 되어 최신 메시지만 표시되는지 확인"""
+    page = EchoBoxPage(wd)
+    page.open_echo_box()
 
-    # Echo Box 화면 진입
-    wd.find_element(By.XPATH, '(//android.view.ViewGroup[@resource-id="RNE__LISTITEM__padView"])[1]').click()
-
-    # 첫 번째 입력 텍스트 정의
     input_text1 = "Hello Test1"
-    # 두 번째 입력 텍스트 정의
     input_text2 = "Hello Test2"
 
-    # 첫 번째 텍스트 입력 및 저장
-    inputfield = wd.find_element(AppiumBy.ACCESSIBILITY_ID, "messageInput")
-    inputfield.send_keys(input_text1)
-    saveBtn = wd.find_element(AppiumBy.ACCESSIBILITY_ID, "messageSaveBtn")
-    saveBtn.click()
+    page.input_message(input_text1)
+    page.save_message()
 
-    # 저장 처리 대기 (0.5초)
-    sleep(0.5)
-    
-    # 두 번째 텍스트 입력 및 저장
-    inputfield = wd.find_element(AppiumBy.ACCESSIBILITY_ID, "messageInput")
-    inputfield.send_keys(input_text2)
-    saveBtn = wd.find_element(AppiumBy.ACCESSIBILITY_ID, "messageSaveBtn")
-    saveBtn.click()
+    page.input_message(input_text2)
+    page.save_message()
 
-    # 저장된 메시지 element 지정
-    result = wd.find_element(By.XPATH, "//*[@resource-id='savedMessage']")
-
-    # Assertion: 저장된 메시지가 두 번째 입력 텍스트와 동일함
-    check.equal(result.text, input_text2)
+    saved_text = page.get_saved_message()
+    check.equal(saved_text, input_text2)

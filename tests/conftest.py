@@ -13,10 +13,10 @@ log = logging.getLogger(__name__)
 # 📱 Device Configuration
 devices = [
     # Device 1
-    pytest.param(
-        {"udid": "emulator-5556", "systemPort": 8200, "server_url": "http://127.0.0.1:4723"},
-        id="emulator-5556"
-    ),
+    # pytest.param(
+    #     {"udid": "emulator-5556", "systemPort": 8200, "server_url": "http://127.0.0.1:4723"},
+    #     id="emulator-5556"
+    # ),
     # Device 2
     pytest.param(
         {"udid": "emulator-5554", "systemPort": 8201, "server_url": "http://127.0.0.1:4725"},
