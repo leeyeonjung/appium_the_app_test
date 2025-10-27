@@ -70,61 +70,61 @@ Appium에서 공식 배포하는 샘플 앱 **“The App”** 의 주요 기능�
 ```
 appium_the_app/
 ├── app/                                         
-│   └── app-release.apk                          # 실제 테스트용 Appium 공식 샘플 APK 파일
+│   └── app-release.apk                          # Appium 공식 샘플 APK (테스트 대상 앱)
 │
-├── appium_server/                               # Appium 서버 환경 구성 폴더
-│   ├── docker-compose.yml                       # Appium Server Docker 환경 정의 파일
-│   └── entrypoint.sh                            # Appium Server 컨테이너 초기화 스크립트
+├── appium_server/                               # Appium 서버 환경 구성
+│   ├── docker-compose.yml                       # Appium Server Docker 환경 정의
+│   └── entrypoint.sh                            # 컨테이너 초기화 스크립트
 │
-├── jenkins_test_repo/                           # Jenkins 파이프라인 트리거용 테스트 리포지토리
-│   └── testfile.txt                             # 변경 감지를 위한 예시 파일 (파이프라인 실행 트리거 용도)
+├── jenkins_test_repo/                           # Jenkins 빌드 트리거용 리포지토리
+│   └── testfile.txt                             # 변경 감지용 더미 파일
 │
-├── testcase_excel/                              
-│   └── (Testcase)The_App.xlsm                   # 테스트 시나리오별 테스트 케이스 문서
+├── testcase_excel/
+│   └── (Testcase)The_App.xlsm                   # 테스트 케이스 관리용 Excel 문서
 │
-├── tests/                                       # 테스트 코드 및 결과 관리 폴더
-│   ├── conftest.py                              # pytest 전역 설정 및 Appium driver fixture 정의
+├── tests/
+│   ├── conftest.py                              # pytest 전역 설정 및 driver fixture 정의
 │   │
 │   ├── common_util/                             # 공통 유틸리티 모듈
-│   │   ├── control_image.py                     # SSIM 기반 이미지 유사도 검증 모듈
+│   │   └── control_image.py                     # SSIM 기반 이미지 비교 유틸리티
 │   │
-│   ├── image/                                   # baseline 이미지 저장 폴더
-│   │   ├── original_1.png ~ original_6.png      # 비교 기준 이미지 파일들
+│   ├── image/                                   # baseline 이미지 저장 경로
+│   │   ├── original_1.png ~ original_6.png
 │   │
-│   ├── testcase/                                # 기능별 테스트 모듈
-│   │   ├── test_0_app_start.py                  # 앱 실행 및 초기 화면 테스트
-│   │   ├── test_1_echo_box.py                   # Echo Box 기능 검증
-│   │   ├── test_2_login_screen.py               # 로그인 화면 검증
-│   │   ├── test_4_webview_demo.py               # WebView 기능 검증
-│   │   └── test_7_photo_demo.py                 # Photo Demo 기능 검증
-│   │
-│   ├── Results/                                 # 실제 테스트 결과 저장 폴더 (HTML Report, 영상, 캡처 포함)
-│   │   ├── image/                               # 테스트 중 캡처 이미지 저장
-│   │   │   ├── [device-1]/                      # 예: emulator-5554, localhost-5555 등
-│   │   │   │   ├── [test_module]/               # 예: test_photo, test_image_text 등
-│   │   │   │   │   ├── captured_1.png
-│   │   │   │   │   ├── captured_2.png
-│   │   │   │   │   └── ...
-│   │   │   └── [device-2]/                      # 두 번째 테스트 기기 폴더
-│   │   │       └── ...
+│   ├── src/                                     
+│   │   ├── locaters/                            # 요소 Locators 정의
+│   │   │   ├── app_start_locaters.py            # App Start 화면 locator
+│   │   │   ├── echo_box_locaters.py             # Echo Box 화면 locator
+│   │   │   ├── login_screen_locaters.py         # Login Screen locator
+│   │   │   ├── photo_demo_locaters.py           # Photo Demo locator
+│   │   │   └── webview_demo_locaters.py         # WebView Demo locator
 │   │   │
-│   │   ├── test-reports/                        # pytest HTML Report 저장 폴더
-│   │   │   └── report_YYYY-MM-DD_HH-MM-SS.html  # 실행 시각 기준 자동 생성된 리포트 파일
+│   │   ├── pages/                               # Page Action 정의 (click, input, get)
+│   │   │   ├── app_start.py                     # App Start page object
+│   │   │   ├── echo_box.py                      # Echo Box page object
+│   │   │   ├── login_screen.py                  # Login Screen page object
+│   │   │   ├── photo_demo.py                    # Photo Demo page object
+│   │   │   └── webview_demo.py                  # WebView Demo page object
 │   │   │
-│   │   └── video-reports/                       # 테스트 실행 중 녹화 영상 저장 폴더
-│   │       ├── [device-1]/                      # 예: emulator-5554
-│   │       │   ├── [test_case_name]/            # 예: test_0_app_start, test_login 등
-│   │       │   │   ├── test_[scene]_01_YYYY-MM-DD_HH-MM-SS.mp4
-│   │       │   │   ├── test_[scene]_02_YYYY-MM-DD_HH-MM-SS.mp4
-│   │       │   │   └── ...
-│   │       └── [device-2]/                      # 두 번째 테스트 기기 폴더
-│   │           └── ...
+│   │   └── testcase/                            # 실제 테스트 시나리오 및 검증 로직
+│   │       ├── test_0_app_start.py              # 앱 실행 및 초기 화면 진입 테스트
+│   │       ├── test_1_echo_box.py               # Echo Box 입력 및 출력 검증
+│   │       ├── test_2_login_screen.py           # 로그인 화면 검증
+│   │       ├── test_4_webview_demo.py           # WebView 페이지 테스트
+│   │       └── test_7_photo_demo.py             # Photo Demo 이미지 비교 테스트
+│   │
+│   ├── Results/                                 # 테스트 실행 결과 저장 폴더
+│   │   ├── image/                               # 캡처 이미지 저장
+│   │   ├── test-reports/                        # pytest HTML 리포트
+│   │   └── video-reports/                       # 테스트 실행 녹화 영상
+│   │
+│   └── __init__.py                              # tests 패키지 인식용
 │
-├── requirements.txt                             # 테스트 환경 의존성 정의 파일
+├── requirements.txt                             # Python 의존성 패키지 목록
 │
-├── Jenkinsfile                                  # Jenkins Pipeline 스크립트
+├── Jenkinsfile                                  # Jenkins 파이프라인 정의
 │
-└── README.md                                    # 프로젝트 개요, 구조, 실행 방법 등 문서
+└── README.md                                    # 프로젝트 개요 및 실행 가이드
 ```
 
 ---
