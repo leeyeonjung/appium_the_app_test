@@ -35,14 +35,14 @@ class PhotoDemoPage:
         """스크롤을 위한 기기 화면 사이즈 반환"""
         return self.driver.get_window_rect()
 
-    def swipe_up(self, step: float = 0.45, duration_ms: int = 900):
+    def swipe_up(self, step: float = 0.40):
         """화면 스크롤 위치 지정"""
         win = self.get_window_size()
         start_x = win["width"] // 2
         start_y = int(win["height"] * 0.75)
         end_y   = int(win["height"] * (0.75 - step))
         log.debug(f"[SWIPE] ({start_x},{start_y}) → ({start_x},{end_y})")
-        self.driver.swipe(start_x, start_y, start_x, end_y, duration_ms)
+        self.driver.swipe(start_x, start_y, start_x, end_y)
         sleep(1.2)
 
     def get_all_image_views(self):
