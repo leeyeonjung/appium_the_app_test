@@ -16,7 +16,7 @@ Appium에서 공식 배포하는 샘플 앱 **“The App”** 의 주요 기능�
 ## 📊 Test Report Example
 (아래 링크를 클릭하면, 해당 리포지토리의 `tests/Result/test-reports` 경로에 있는 HTML 파일이 렌더링됩니다.)
 
-[🔗 View Full HTML Report](https://htmlpreview.github.io/?https://github.com/leeyeonjung/appium_the_app/blob/main/tests/Result/test-reports/report_2025-10-16_15-27-03.html)<br><br>
+[🔗 View Full HTML Report](https://htmlpreview.github.io/?https://github.com/leeyeonjung/appium_the_app/blob/main/tests/Result/test-reports/report_2025-10-28_15-30-01.html)<br><br>
 
 <p align="center">
   <img width="600" alt="HTML Report Screenshot" src="https://github.com/user-attachments/assets/6f1b3fc7-b3a3-4739-8070-a269c46f4a13" />
