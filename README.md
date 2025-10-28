@@ -138,7 +138,13 @@ appium_the_app/
 | **Execution Flow** | Jenkins → Remote Windows (pytest 실행) → 로컬 환경에서 생성된 HTML Report 수집 → Jenkins에서 표시 |
 | **Trigger** | GitHub Push 이벤트를 감지하여, jenkins_test_repo 디렉터리 및 하위 파일에 변경이 발생하면 테스트 코드 실행이 자동으로 트리거 |
 
-### 🤖 Git webhook 설정
+### 🔗 GitHub 연동 & Jenkins 자동 실행 설정
+- Jenkins 자동 실행 설정
+<img width="450" height="120" alt="image" src="https://github.com/user-attachments/assets/b53a4aae-d821-4d27-a051-6b539b4fd51a" />
+
+<p></p>
+
+- Github Webhook 연동
 <img width="441" height="250" alt="image" src="https://github.com/user-attachments/assets/941e7bcd-4271-4f42-9563-adcfd6608ff2" />
 
 
@@ -151,6 +157,12 @@ appium_the_app/
        playsinline
        muted>
 </video>
+
+### ✅ Jenkins Build Success Result
+<img width="320" height="97" alt="image" src="https://github.com/user-attachments/assets/6e9ab34c-ee2c-49ce-8711-98503a3ea681" />
+<p></p>
+<img width="295" height="235" alt="image" src="https://github.com/user-attachments/assets/cdfb437e-8da9-49ae-872a-5bbf47198a92" />
+
 
 ---
 
