@@ -35,7 +35,7 @@ pipeline {
                 echo "🚀 Running pytest..."
                 bat '''
                     cd C:\\appium_the_app
-                    pytest -v C:\\appium_the_app\\tests\\testcase\\test_7_photo_demo.py --maxfail=1 --disable-warnings 
+                    pytest -v --maxfail=1 --disable-warnings 
                 '''
             }
         }
