@@ -59,7 +59,7 @@ def test_photo(wd):
         if len(captured) >= 6:
             log.info("All 6 images captured.")
             break
-        page.swipe_up(step=0.45)
+        page.swipe_up()
         if len(captured) == before:
             log.info("No new images detected after swipe.")
             break
@@ -178,7 +178,7 @@ def test_image_text(wd):
         if len(verified_texts) >= len(expected_texts):
             log.info("All expected images verified. Stopping scroll.")
             break
-        page.swipe_up(step=0.45)
+        page.swipe_up()
         if len(verified_texts) == before:
             log.info("🔚 No new verifications after swipe. Stopping.")
             break

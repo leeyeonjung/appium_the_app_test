@@ -7,6 +7,9 @@ from pathlib import Path
 
 # Third-party libraries
 from selenium.webdriver.common.by import By
+from selenium.webdriver.common.actions.action_builder import ActionBuilder
+from selenium.webdriver.common.actions.pointer_input import PointerInput
+from selenium.webdriver.common.actions.interaction import POINTER_TOUCH
 
 # Local modules
 import tests.src.locaters.photo_demo_locaters as loc
@@ -35,14 +38,33 @@ class PhotoDemoPage:
         """스크롤을 위한 기기 화면 사이즈 반환"""
         return self.driver.get_window_rect()
 
-    def swipe_up(self, step: float = 0.40):
-        """화면 스크롤 위치 지정"""
+    def swipe_up(self, step: float = 0.25, duration: int = 15000):
+        """
+        화면을 위로 스와이프 (Selenium 4 W3C ActionBuilder)
+        :param step: 이동 거리 비율 (0.25 → 화면 높이의 25%)
+        :param duration: 제스처 시간(ms) (너무 짧으면 플링으로 인식될 수 있음)
+        """
         win = self.get_window_size()
         start_x = win["width"] // 2
         start_y = int(win["height"] * 0.75)
         end_y   = int(win["height"] * (0.75 - step))
-        log.debug(f"[SWIPE] ({start_x},{start_y}) → ({start_x},{end_y})")
-        self.driver.swipe(start_x, start_y, start_x, end_y)
+
+        log.debug(f"[SWIPE_UP] ({start_x},{start_y}) → ({start_x},{end_y}), step={step}, duration={duration}ms")
+
+        # 터치 포인터 장치 정의
+        finger = PointerInput(POINTER_TOUCH, "finger")
+        actions = ActionBuilder(self.driver, mouse=finger)
+
+        # 제스처 구성
+        pa = actions.pointer_action
+        pa.move_to_location(start_x, start_y)
+        pa.pointer_down()
+        # duration은 초 단위로 pause
+        pa.pause(duration / 1000.0)
+        pa.move_to_location(start_x, end_y)
+        pa.release()
+
+        actions.perform()
         sleep(1.2)
 
     def get_all_image_views(self):
@@ -62,7 +84,6 @@ class PhotoDemoPage:
         self.driver.find_element(By.XPATH, loc.BUTTON_OK).click()
         sleep(0.8)
 
-    # ---------- capture ----------
     def capture_visible_square_images(self, save_dir, seen_rects: set, captured: set, use_scroll_view=True):
         """현재 화면의 보이는 정사각형 이미지들을 파일로 저장 (중복 방지 로직 적용)"""
         win = self.get_window_size()
