@@ -1,10 +1,15 @@
+# tests/conftest.py
+
+# Standard library
 import os
 import json
 import base64
-import pytest
 import logging
 from datetime import datetime
 from pathlib import Path
+
+# Third-party libraries
+import pytest
 from dotenv import load_dotenv
 from appium import webdriver
 from appium.options.android import UiAutomator2Options
