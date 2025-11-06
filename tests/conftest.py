@@ -1,28 +1,46 @@
 import os
+import json
 import base64
 import pytest
 import logging
 from datetime import datetime
 from pathlib import Path
+from dotenv import load_dotenv
 from appium import webdriver
 from appium.options.android import UiAutomator2Options
 
 log = logging.getLogger(__name__)
 
+# .env 파일 로드
+env_path = Path(__file__).resolve().parent / ".env"
+load_dotenv(env_path)
+
 
 # 📱 Device Configuration
-devices = [
-    # Device 1
-    # pytest.param(
-    #     {"udid": "emulator-5556", "systemPort": 8200, "server_url": "http://127.0.0.1:4723"},
-    #     id="emulator-5556"
-    # ),
-    # Device 2
-    pytest.param(
-        {"udid": "emulator-5554", "systemPort": 8201, "server_url": "http://127.0.0.1:4725"},
-        id="emulator-5554"
-    ),
-]
+def load_devices_from_env():
+    """환경변수에서 devices 설정을 로드합니다."""
+    devices_json = os.getenv("DEVICES", "[]")
+    devices_list = json.loads(devices_json)
+    
+    # pytest.param 리스트로 변환
+    devices = []
+    for device_config in devices_list:        
+        device_id = device_config.get("udid", "unknown")
+        devices.append(
+            pytest.param(
+                {
+                    "udid": device_config["udid"],
+                    "systemPort": device_config["systemPort"],
+                    "server_url": device_config["server_url"]
+                },
+                id=device_id
+            )
+        )
+        
+    return devices
+
+
+devices = load_devices_from_env()
 
 
 # 📱 Appium Driver 설정

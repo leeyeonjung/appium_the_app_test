@@ -174,6 +174,45 @@ appium_the_app/
 pip install -r requirements.txt
 ```
 
+### 1️⃣-1️⃣ Device Configuration (.env 파일 설정)
+테스트에 사용할 기기(device) 설정은 `tests/.env` 파일에서 관리합니다.
+
+#### 📝 .env 파일 생성
+```bash
+# .env.example 파일을 .env로 복사
+cd tests
+cp .env.example .env
+```
+
+#### 🔧 Device 설정 방법
+`tests/.env` 파일에서 `DEVICES` 환경변수를 JSON 배열 형식으로 설정합니다.
+
+**예시 1: 단일 기기 사용**
+```env
+DEVICES=[{"udid": "emulator-5554", "systemPort": 8201, "server_url": "http://127.0.0.1:4725"}]
+```
+
+**예시 2: 여러 기기 사용**
+```env
+DEVICES=[
+  {"udid": "emulator-5556", "systemPort": 8200, "server_url": "http://127.0.0.1:4723"},
+  {"udid": "emulator-5554", "systemPort": 8201, "server_url": "http://127.0.0.1:4725"},
+  {"udid": "emulator-5558", "systemPort": 8202, "server_url": "http://127.0.0.1:4727"}
+]
+```
+
+#### ⚙️ 필수 설정 항목
+각 device 설정에는 다음 항목이 필수입니다:
+- **`udid`**: 기기 식별자 (예: `"emulator-5554"`, `"R58M30ABCDE"`)
+- **`systemPort`**: 각 기기별 고유한 시스템 포트 (충돌 방지를 위해 서로 다른 포트 사용)
+- **`server_url`**: Appium 서버 URL (각 기기별로 다른 서버를 사용할 수 있음)
+
+#### ⚠️ 주의사항
+- 각 기기의 `systemPort`는 서로 달라야 합니다.
+- 여러 기기를 사용할 경우, 각각 다른 Appium 서버 인스턴스를 실행해야 할 수 있습니다.
+- JSON 형식이므로 따옴표와 대괄호를 정확히 사용해야 합니다.
+- 환경별로 다른 `.env` 파일을 사용하거나, 환경변수로 직접 설정할 수 있습니다.
+
 ### 2️⃣ 테스트 실행
 ```bash
 # Pytest를 이용해 전체 테스트 실행
