@@ -11,6 +11,10 @@ Appium에서 공식 배포하는 샘플 앱 **“The App”** 의 주요 기능�
   **로컬(Windows) 테스트 환경을 원격으로 제어 및 실행**할 수 있도록 구성했습니다.  
   (Appium Server, Emulator, Pytest 환경은 Windows PC에서 구동되며, Jenkins는 원격 실행을 담당)
 
+### CI/CD Architecture
+<img width="800" height="440" alt="image" src="https://github.com/user-attachments/assets/e613fbcb-f5a6-473d-a3ad-fc6a8f4d37ad" />
+
+
 ---
 
 ## 📊 Test Report Example
