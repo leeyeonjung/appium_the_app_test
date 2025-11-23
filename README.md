@@ -143,8 +143,9 @@ appium_the_app/
 | **Trigger** | GitHub Push 이벤트를 감지하여, jenkins_test_repo 디렉터리 및 하위 파일에 변경이 발생하면 테스트 코드 실행이 자동으로 트리거 |
 
 ### 🔗 GitHub 연동 & Jenkins 자동 실행 설정
-- Jenkins 자동 실행 설정
-<img width="450" height="120" alt="image" src="https://github.com/user-attachments/assets/b53a4aae-d821-4d27-a051-6b539b4fd51a" />
+- Jenkins 자동 실행 설정 : 특정 폴더의 파일이 수정되었을 경우에만 pipeline이 실행 되도록 설정
+<img width="450" height="120" alt="image" src="https://github.com/user-attachments/assets/e0f3a43b-f367-4d2e-8600-3fb9204ed99b" />
+
 
 <p></p>
 
