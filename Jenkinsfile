@@ -1,24 +1,16 @@
 pipeline {
     agent { label 'windows' }
 
-    triggers {
-        githubPush()   // ✅ GitHub webhook push 시 자동 실행
-    }
-
     stages {
+        /*
+        // 이전 Jenkinsfile의 'Skip Info' 스테이지는 이제 필요 없습니다.
+        // Jenkins가 애초에 빌드를 시작하지 않기 때문입니다.
         stage('Skip Info') {
-            when {
-                not { changeset pattern: "jenkins_test_repo/**", comparator: "ANT" }
-            }
-            steps {
-                echo "🟡 No changes → Skipping test execution."
-                script {
-                    currentBuild.result = 'ABORTED'
-                    error("Stop remaining stages due to no changes.")
-                }
-            }
+            ...
         }
-/*
+        */
+
+        // Checkout Test Code 스테이지는 주석 처리된 상태로 유지합니다.
         stage('Checkout Test Code') {
             steps {
                 echo "📦 Updating local appium_the_app repository..."
@@ -29,7 +21,7 @@ pipeline {
                 '''
             }
         }
-*/
+
         stage('Run Pytest on Windows') {
             steps {
                 echo "🚀 Running pytest..."
@@ -45,11 +37,11 @@ pipeline {
     post {
         always {
             script {
-                // ✅ Skip(ABORTED) 상태면 post 블록 실행하지 않음
-                if (currentBuild.result == 'ABORTED') {
-                    echo "⏩ Post block skipped (build was aborted)."
-                    return
-                }
+                // 더 이상 ABORTED 상태를 확인할 필요가 없습니다.
+                // if (currentBuild.result == 'ABORTED') {
+                //     echo "⏩ Post block skipped (build was aborted)."
+                //     return
+                // }
 
                 echo "📊 Collecting latest HTML report..."
 
