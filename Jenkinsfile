@@ -1,50 +1,24 @@
 pipeline {
     agent { label 'windows' }
 
+    triggers {
+        githubPush()
+    }
+
     stages {
-
-        // ============================
-        // Stage 0: 변경된 파일 확인
-        // ============================
-        stage('Check Changed Files') {
+        stage('Skip Info') {
+            when {
+                not { changeset pattern: "jenkins_test_repo/**", comparator: "ANT" }
+            }
             steps {
+                echo "🟡 No changes → Skipping test execution."
                 script {
-                    echo "🔍 Checking if jenkins_test_repo/ has changes..."
-
-                    def changed = false
-
-                    // GitHub Webhook으로 전달된 changeSet 확인
-                    for (change in currentBuild.changeSets) {
-                        for (item in change.items) {
-                            for (file in item.affectedFiles) {
-                                echo "Changed file: ${file.path}"
-                                if (file.path.startsWith("jenkins_test_repo/")) {
-                                    changed = true
-                                }
-                            }
-                        }
-                    }
-
-                    if (!changed) {
-                        echo "⏳ No changes in jenkins_test_repo/. Entire pipeline skipped."
-
-                        // 파이프라인 상태 지정
-                        currentBuild.result = 'NOT_BUILT'
-
-                        // 파이프라인 전체 종료 (ERROR 출력 없이 종료)
-                        throw new org.jenkinsci.plugins.workflow.steps.FlowInterruptedException(
-                            org.jenkinsci.plugins.workflow.steps.FlowInterruptedException.Result.NOT_BUILT
-                        )
-                    }
-
-                    echo "✅ Change detected in jenkins_test_repo/. Continuing pipeline..."
+                    currentBuild.result = 'ABORTED'
+                    error("Stop remaining stages due to no changes.")
                 }
             }
         }
 
-        // ============================
-        // Stage 1: 테스트 코드 체크아웃
-        // ============================
         stage('Checkout Test Code') {
             steps {
                 echo "📦 Updating local appium_the_app repository..."
@@ -56,25 +30,30 @@ pipeline {
             }
         }
 
-        // ============================
-        // Stage 2: Pytest 실행
-        // ============================
         stage('Run Pytest on Windows') {
             steps {
                 echo "🚀 Running pytest..."
                 bat '''
                     cd C:\\Automation\\appium_the_app
-                    pytest -v --maxfail=1 --disable-warnings
+                    pytest -v --maxfail=1 --disable-warnings 
                 '''
             }
         }
+
     }
 
     post {
         always {
             script {
+                // ✅ Skip(ABORTED) 상태면 post 블록 실행하지 않음
+                if (currentBuild.result == 'ABORTED') {
+                    echo "⏩ Post block skipped (build was aborted)."
+                    return
+                }
+
                 echo "📊 Collecting latest HTML report..."
 
+                // ✅ 최신 HTML 1개만 Jenkins 워크스페이스로 복사 (파일명 변경 없음)
                 bat '''
                     setlocal enabledelayedexpansion
                     set "REPORT_DIR=C:\\Automation\\appium_the_app\\tests\\Result\\test-reports"
@@ -85,6 +64,7 @@ pipeline {
                         exit /b 0
                     )
 
+                    REM 최신순으로 정렬 후 첫 번째(가장 최근) 파일만 선택
                     for /f "delims=" %%A in ('dir /b /a-d /o-d "%REPORT_DIR%\\*.html" 2^>nul') do (
                         set "LATEST=%%A"
                         goto :found
