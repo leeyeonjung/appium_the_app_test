@@ -11,13 +11,9 @@ pipeline {
         stage('Checkout Test Code') {
             steps {
                 echo "📦 Updating local appium_the_app repository..."
-                // Windows 배치 스크립트 실행
                 bat '''
-                    REM 작업 디렉토리로 이동
                     cd C:\\appium_the_app
-                    REM 원격 저장소의 main 브랜치 최신 변경사항 가져오기
                     git fetch origin main
-                    REM 로컬 저장소를 원격 main 브랜치와 완전히 동기화 (로컬 변경사항 무시)
                     git reset --hard origin/main
                 '''
             }
@@ -29,12 +25,7 @@ pipeline {
             steps {
                 echo "🚀 Running pytest..."
                 bat '''
-                    REM 테스트 디렉토리로 이동
                     cd C:\\appium_the_app
-                    REM pytest 실행 옵션:
-                    REM -v: 상세 출력 (verbose)
-                    REM --maxfail=1: 첫 번째 실패 후 중단
-                    REM --disable-warnings: 경고 메시지 비활성화
                     pytest -v --maxfail=1 --disable-warnings 
                 '''
             }
@@ -52,43 +43,29 @@ pipeline {
 
                 // Windows 배치 스크립트로 최신 HTML 리포트 찾기 및 복사
                 bat '''
-                    REM 지연된 변수 확장 활성화 (변수 값을 동적으로 사용하기 위함)
                     setlocal enabledelayedexpansion
-                    REM 리포트가 저장된 디렉토리 경로 설정
                     set "REPORT_DIR=C:\\appium_the_app\\tests\\Result\\test-reports"
-                    REM 최신 리포트 파일명을 저장할 변수 초기화
                     set "LATEST="
 
-                    REM 리포트 디렉토리가 존재하는지 확인
                     if not exist "%REPORT_DIR%" (
                         echo ⚠️ Report directory not found: "%REPORT_DIR%"
-                        REM 디렉토리가 없어도 에러 없이 종료
                         exit /b 0
                     )
 
-                    REM 최신순으로 정렬 후 첫 번째(가장 최근) 파일만 선택
-                    REM dir /b: 파일명만 출력, /a-d: 디렉토리 제외, /o-d: 수정일시 내림차순 정렬
-                    REM 2^>nul: 에러 메시지 숨김
                     for /f "delims=" %%A in ('dir /b /a-d /o-d "%REPORT_DIR%\\*.html" 2^>nul') do (
                         set "LATEST=%%A"
-                        REM 첫 번째 파일을 찾으면 루프 종료
                         goto :found
                     )
 
                     :found
-                    REM 리포트 파일이 없는 경우 처리
                     if not defined LATEST (
                         echo ⚠️ No HTML report found in "%REPORT_DIR%"
                         exit /b 0
                     )
 
-                    REM 최신 리포트 파일을 찾았음을 알림
                     echo ✅ Found latest report: !LATEST!
-                    REM 최신 리포트를 Jenkins 워크스페이스로 복사
-                    REM >nul: 복사 메시지 숨김
                     copy "%REPORT_DIR%\\!LATEST!" "%WORKSPACE%\\!LATEST!" >nul
                     echo ✅ Copied !LATEST! to Jenkins workspace.
-                    REM 로컬 변수 환경 종료
                     endlocal
                 '''
 
