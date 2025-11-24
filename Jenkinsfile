@@ -1,13 +1,45 @@
 pipeline {
-    // Windows 에이전트에서 실행
-    // label 'windows'로 지정된 Jenkins 노드에서 파이프라인이 실행됩니다
     agent { label 'windows' }
 
-    // 파이프라인의 실행 단계들을 정의
     stages {
 
+        // ============================
+        // Stage 0: 변경된 파일 확인
+        // ============================
+        stage('Check Changed Files') {
+            steps {
+                script {
+                    echo "🔍 Checking if jenkins_test_repo/ has changes..."
+
+                    def changed = false
+
+                    // currentBuild.changeSets: 이번 webhook으로 들어온 변경사항 목록
+                    for (change in currentBuild.changeSets) {
+                        for (item in change.items) {
+                            for (file in item.affectedFiles) {
+                                echo "Changed file: ${file.path}"
+                                if (file.path.startsWith("jenkins_test_repo/")) {
+                                    changed = true
+                                }
+                            }
+                        }
+                    }
+
+                    if (!changed) {
+                        echo "⏳ No changes in jenkins_test_repo/. Skipping build."
+                        currentBuild.result = 'NOT_BUILT'
+                        // 빌드 즉시 종료
+                        error("No relevant changes.")
+                    }
+
+                    echo "✅ Change detected in jenkins_test_repo/. Build will continue."
+                }
+            }
+        }
+
+        // ============================
         // Stage 1: 테스트 코드 체크아웃
-        // 최신 코드를 가져와서 로컬 저장소를 업데이트합니다
+        // ============================
         stage('Checkout Test Code') {
             steps {
                 echo "📦 Updating local appium_the_app repository..."
@@ -19,29 +51,27 @@ pipeline {
             }
         }
 
+        // ============================
         // Stage 2: Pytest 실행
-        // Appium 테스트 케이스들을 실행합니다
+        // ============================
         stage('Run Pytest on Windows') {
             steps {
                 echo "🚀 Running pytest..."
                 bat '''
                     cd C:\\Automation\\appium_the_app
-                    pytest -v --maxfail=1 --disable-warnings 
+                    pytest -v --maxfail=1 --disable-warnings
                 '''
             }
         }
 
     }
 
-    // 파이프라인 실행 후 항상 실행되는 후처리 단계
-    // 성공/실패 여부와 관계없이 리포트를 수집합니다
     post {
         always {
             script {
 
                 echo "📊 Collecting latest HTML report..."
 
-                // Windows 배치 스크립트로 최신 HTML 리포트 찾기 및 복사
                 bat '''
                     setlocal enabledelayedexpansion
                     set "REPORT_DIR=C:\\Automation\\appium_the_app\\tests\\Result\\test-reports"
@@ -70,10 +100,6 @@ pipeline {
                 '''
 
                 echo "📤 Archiving only the latest HTML report..."
-                // HTML 리포트 파일을 Jenkins 아티팩트로 아카이빙
-                // artifacts: '*.html': 워크스페이스의 모든 HTML 파일
-                // fingerprint: true: 파일 지문 생성 (빌드 추적용)
-                // onlyIfSuccessful: false: 실패한 빌드에서도 아카이빙
                 archiveArtifacts artifacts: '*.html', fingerprint: true, onlyIfSuccessful: false
             }
         }
