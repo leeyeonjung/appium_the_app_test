@@ -13,7 +13,7 @@ pipeline {
 
                     def changed = false
 
-                    // currentBuild.changeSets: 이번 webhook으로 들어온 변경사항 목록
+                    // GitHub Webhook으로 전달된 changeSet 확인
                     for (change in currentBuild.changeSets) {
                         for (item in change.items) {
                             for (file in item.affectedFiles) {
@@ -26,12 +26,18 @@ pipeline {
                     }
 
                     if (!changed) {
-                        echo "⏳ No changes in jenkins_test_repo/. Skipping build."
+                        echo "⏳ No changes in jenkins_test_repo/. Entire pipeline skipped."
+
+                        // 파이프라인 상태 지정
                         currentBuild.result = 'NOT_BUILT'
-                        return
+
+                        // 파이프라인 전체 종료 (ERROR 출력 없이 종료)
+                        throw new org.jenkinsci.plugins.workflow.steps.FlowInterruptedException(
+                            org.jenkinsci.plugins.workflow.steps.FlowInterruptedException.Result.NOT_BUILT
+                        )
                     }
 
-                    echo "✅ Change detected in jenkins_test_repo/. Build will continue."
+                    echo "✅ Change detected in jenkins_test_repo/. Continuing pipeline..."
                 }
             }
         }
@@ -62,13 +68,11 @@ pipeline {
                 '''
             }
         }
-
     }
 
     post {
         always {
             script {
-
                 echo "📊 Collecting latest HTML report..."
 
                 bat '''
