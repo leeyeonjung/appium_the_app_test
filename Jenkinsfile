@@ -12,7 +12,7 @@ pipeline {
             steps {
                 echo "📦 Updating local appium_the_app repository..."
                 bat '''
-                    cd C:\\appium_the_app
+                    cd C:\\Automation\\appium_the_app
                     git fetch origin main
                     git reset --hard origin/main
                 '''
@@ -25,7 +25,7 @@ pipeline {
             steps {
                 echo "🚀 Running pytest..."
                 bat '''
-                    cd C:\\appium_the_app
+                    cd C:\\Automation\\appium_the_app
                     pytest -v --maxfail=1 --disable-warnings 
                 '''
             }
@@ -44,7 +44,7 @@ pipeline {
                 // Windows 배치 스크립트로 최신 HTML 리포트 찾기 및 복사
                 bat '''
                     setlocal enabledelayedexpansion
-                    set "REPORT_DIR=C:\\appium_the_app\\tests\\Result\\test-reports"
+                    set "REPORT_DIR=C:\\Automation\\appium_the_app\\tests\\Result\\test-reports"
                     set "LATEST="
 
                     if not exist "%REPORT_DIR%" (
