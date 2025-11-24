@@ -28,8 +28,7 @@ pipeline {
                     if (!changed) {
                         echo "⏳ No changes in jenkins_test_repo/. Skipping build."
                         currentBuild.result = 'NOT_BUILT'
-                        // 빌드 즉시 종료
-                        error("No relevant changes.")
+                        return
                     }
 
                     echo "✅ Change detected in jenkins_test_repo/. Build will continue."
