@@ -1,5 +1,5 @@
 pipeline {
-    agent { label 'windows' }
+    agent { label 'mobile_windows' }
 
     triggers {
         githubPush()
