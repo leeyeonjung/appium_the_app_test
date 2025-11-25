@@ -7,6 +7,8 @@ from pathlib import Path
 
 # Third-party libraries
 from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.actions.action_builder import ActionBuilder
 from selenium.webdriver.common.actions.pointer_input import PointerInput
 from selenium.webdriver.common.actions.interaction import POINTER_TOUCH
@@ -22,21 +24,28 @@ class PhotoDemoPage:
 
     def __init__(self, driver):
         self.driver = driver
+        self.wait = WebDriverWait(driver, 10)
         self.base_dir = Path(__file__).resolve().parents[2]  # tests/
         self.image_dir = self.base_dir / "image"
+
 
     def open_photo_demo(self):
         """홈 화면에서 photo demo 클릭"""
         log.debug("Photo Demo 화면 진입")
-        self.driver.find_element(By.XPATH, loc.MENU_ITEM).click()
+        element = self.wait.until(EC.element_to_be_clickable((By.XPATH, loc.MENU_ITEM)))
+        element.click()
+
 
     def get_title_text(self):
         """화면 title text 반환"""
-        return self.driver.find_element(By.XPATH, loc.TITLE_TEXT).text
+        element = self.wait.until(EC.presence_of_element_located((By.XPATH, loc.TITLE_TEXT)))
+        return element.text
+
 
     def get_window_size(self):
         """스크롤을 위한 기기 화면 사이즈 반환"""
         return self.driver.get_window_rect()
+
 
     def swipe_up(self, step: float = 0.25, duration: int = 15000):
         """
@@ -67,22 +76,30 @@ class PhotoDemoPage:
         actions.perform()
         sleep(1.2)
 
+
     def get_all_image_views(self):
         """화면 내 전체 image list 반환"""
+        self.wait.until(EC.presence_of_element_located((By.XPATH, loc.IMAGE_VIEWS)))
         return self.driver.find_elements(By.XPATH, loc.IMAGE_VIEWS)
+
 
     def tap_element(self, el):
         """이미지 클릭"""
         el.click()
         sleep(0.5)
 
+
     def get_dialog_text(self):
-        return self.driver.find_element(By.XPATH, loc.DIALOG_TEXT).text.strip()
+        element = self.wait.until(EC.presence_of_element_located((By.XPATH, loc.DIALOG_TEXT)))
+        return element.text.strip()
+
 
     def close_dialog_ok(self):
         """이미지 화면 ok 버튼 클릭"""
-        self.driver.find_element(By.XPATH, loc.BUTTON_OK).click()
+        element = self.wait.until(EC.element_to_be_clickable((By.XPATH, loc.BUTTON_OK)))
+        element.click()
         sleep(0.8)
+
 
     def capture_visible_square_images(self, save_dir, seen_rects: set, captured: set, use_scroll_view=True):
         """현재 화면의 보이는 정사각형 이미지들을 파일로 저장 (중복 방지 로직 적용)"""
