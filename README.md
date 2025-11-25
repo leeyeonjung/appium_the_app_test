@@ -1,7 +1,7 @@
 # 📱 Appium Automated Test Project – *The App*
 ---
 
-## 🧩 Overview
+## 🧩 Overview  
 이 프로젝트는 **Appium, Python, Pytest**를 이용하여  
 Appium에서 공식 배포하는 샘플 앱 **“The App”** 의 주요 기능을 자동화 테스트한 개인 프로젝트입니다.
 
