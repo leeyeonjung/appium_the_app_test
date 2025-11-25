@@ -1,30 +1,14 @@
 pipeline {
     agent { label 'mobile_windows' }
 
-    triggers {
-        githubPush()
-    }
-
     stages {
-        stage('Skip Info') {
-            when {
-                not { changeset pattern: "jenkins_test_repo/**", comparator: "ANT" }
-            }
-            steps {
-                echo "🟡 No changes → Skipping test execution."
-                script {
-                    currentBuild.result = 'ABORTED'
-                    error("Stop remaining stages due to no changes.")
-                }
-            }
-        }
 
         stage('Checkout Test Code') {
             steps {
-                echo "📦 Updating local appium_the_app repository..."
+                echo "Syncing appium_the_app..."
                 bat '''
                     cd C:\\Automation\\appium_the_app
-                    git fetch origin main
+                    git fetch --all
                     git reset --hard origin/main
                 '''
             }
@@ -32,59 +16,38 @@ pipeline {
 
         stage('Run Pytest on Windows') {
             steps {
-                echo "🚀 Running pytest..."
+                echo "Running pytest..."
                 bat '''
                     cd C:\\Automation\\appium_the_app
-                    pytest -v --maxfail=1 --disable-warnings 
+                    pytest -v
                 '''
             }
         }
-
     }
 
     post {
         always {
-            script {
-                // ✅ Skip(ABORTED) 상태면 post 블록 실행하지 않음
-                if (currentBuild.result == 'ABORTED') {
-                    echo "⏩ Post block skipped (build was aborted)."
-                    return
-                }
+            echo "📊 Collecting latest HTML report..."
+            bat '''
+                setlocal enabledelayedexpansion
+                set "REPORT_DIR=C:\\Automation\\appium_the_app\\tests\\Result\\test-reports"
+                set "LATEST="
 
-                echo "📊 Collecting latest HTML report..."
+                if not exist "%REPORT_DIR%" exit /b 0
 
-                // ✅ 최신 HTML 1개만 Jenkins 워크스페이스로 복사 (파일명 변경 없음)
-                bat '''
-                    setlocal enabledelayedexpansion
-                    set "REPORT_DIR=C:\\Automation\\appium_the_app\\tests\\Result\\test-reports"
-                    set "LATEST="
+                for /f "delims=" %%A in ('dir /b /a-d /o-d "%REPORT_DIR%\\*.html" 2^>nul') do (
+                    set "LATEST=%%A"
+                    goto :found
+                )
 
-                    if not exist "%REPORT_DIR%" (
-                        echo ⚠️ Report directory not found: "%REPORT_DIR%"
-                        exit /b 0
-                    )
+                :found
+                if not defined LATEST exit /b 0
 
-                    REM 최신순으로 정렬 후 첫 번째(가장 최근) 파일만 선택
-                    for /f "delims=" %%A in ('dir /b /a-d /o-d "%REPORT_DIR%\\*.html" 2^>nul') do (
-                        set "LATEST=%%A"
-                        goto :found
-                    )
+                copy "%REPORT_DIR%\\!LATEST!" "%WORKSPACE%\\!LATEST!"
+                endlocal
+            '''
 
-                    :found
-                    if not defined LATEST (
-                        echo ⚠️ No HTML report found in "%REPORT_DIR%"
-                        exit /b 0
-                    )
-
-                    echo ✅ Found latest report: !LATEST!
-                    copy "%REPORT_DIR%\\!LATEST!" "%WORKSPACE%\\!LATEST!" >nul
-                    echo ✅ Copied !LATEST! to Jenkins workspace.
-                    endlocal
-                '''
-
-                echo "📤 Archiving only the latest HTML report..."
-                archiveArtifacts artifacts: '*.html', fingerprint: true, onlyIfSuccessful: false
-            }
+            archiveArtifacts artifacts: '*.html', fingerprint: true
         }
     }
 }
