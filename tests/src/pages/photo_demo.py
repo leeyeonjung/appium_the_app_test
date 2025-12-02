@@ -56,7 +56,7 @@ class PhotoDemoPage:
         win = self.get_window_size()
         start_x = win["width"] // 2
         start_y = int(win["height"] * 0.75)
-        end_y   = int(win["height"] * (0.75 - step))
+        end_y = int(win["height"] * (0.75 - step))
 
         log.debug(f"[SWIPE_UP] ({start_x},{start_y}) → ({start_x},{end_y}), step={step}, duration={duration}ms")
 
@@ -115,7 +115,7 @@ class PhotoDemoPage:
             bottom, right = y + h, x + w
 
             fully_visible = (x >= -10 and y >= 0 and right <= win_w + 10 and bottom <= win_h + 30)
-            square_like   = abs(w - h) < 20
+            square_like = abs(w - h) < 20
             if not (fully_visible and square_like):
                 continue
 
@@ -128,7 +128,7 @@ class PhotoDemoPage:
             if duplicate:
                 continue
 
-            path = save_dir / f"captured_{len(captured)+1}.png"
+            path = save_dir / f"captured_{len(captured) + 1}.png"
             with open(path, "wb") as f:
                 f.write(el.screenshot_as_png)
             seen_rects.add((x, y, w, h))

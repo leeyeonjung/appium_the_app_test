@@ -26,10 +26,10 @@ def load_devices_from_env():
     """환경변수에서 devices 설정을 로드합니다."""
     devices_json = os.getenv("DEVICES", "[]")
     devices_list = json.loads(devices_json)
-    
+
     # pytest.param 리스트로 변환
     devices = []
-    for device_config in devices_list:        
+    for device_config in devices_list:
         device_id = device_config.get("udid", "unknown")
         devices.append(
             pytest.param(
@@ -41,7 +41,7 @@ def load_devices_from_env():
                 id=device_id
             )
         )
-        
+
     return devices
 
 
@@ -67,7 +67,7 @@ def wd(request):
 
 
 # 🎥 Test Video Recording Fixture
-@pytest.fixture(autouse=True) # 비디오 녹화 불필요시 autouse=False 변경하여 사용 가능.
+@pytest.fixture(autouse=True)  # 비디오 녹화 불필요시 autouse=False 변경하여 사용 가능.
 def record_video(request, wd):
 
     # 테스트 스크립트 파일명

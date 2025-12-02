@@ -126,7 +126,7 @@ def test_image_text(wd):
             bottom, right = y + h, x + w
 
             fully_visible = (x >= -10 and y >= 0 and right <= win_w + 10 and bottom <= win_h + 30)
-            square_like   = abs(w - h) < 20
+            square_like = abs(w - h) < 20
             if not (fully_visible and square_like):
                 continue
 
@@ -136,7 +136,7 @@ def test_image_text(wd):
                     break
             else:
                 # 저장
-                path = save_dir / f"captured_{len(captured)+1}.png"
+                path = save_dir / f"captured_{len(captured) + 1}.png"
                 with open(path, "wb") as f:
                     f.write(el.screenshot_as_png)
                 seen_rects.add((x, y, w, h))
@@ -158,7 +158,7 @@ def test_image_text(wd):
                     log.warning(f"[SKIP] {path.name} similarity too low ({best_score:.2f})")
                     continue
 
-                matched_name  = os.path.basename(matched_ref)
+                matched_name = os.path.basename(matched_ref)
                 expected_text = expected_texts[matched_name]
                 log.info(f"[MATCH] {path.name} ↔ {matched_name} ({best_score:.2f})")
 

@@ -3,6 +3,7 @@ import numpy as np
 from PIL import Image
 from skimage.metrics import structural_similarity as ssim
 
+
 def compare(img1, img2):
     """
     두 이미지의 유사도를 SSIM 기반으로 계산하여 0~100 점수 반환
@@ -35,5 +36,6 @@ def compare(img1, img2):
     score, _ = ssim(arr1, arr2, channel_axis=-1, full=True)
 
     return round(score * 100, 2)  # 0~100 점수
+
 
 open = Image.open

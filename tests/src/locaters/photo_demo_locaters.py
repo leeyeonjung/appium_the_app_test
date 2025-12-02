@@ -5,7 +5,10 @@
 MENU_ITEM = '(//android.view.ViewGroup[@resource-id="RNE__LISTITEM__padView"])[7]'
 
 # Photo Demo 화면 내에서의 title
-TITLE_TEXT = '//android.widget.LinearLayout[@resource-id="com.appiumpro.the_app:id/action_bar_root"]//android.widget.TextView'
+TITLE_TEXT = (
+    '//android.widget.LinearLayout[@resource-id="com.appiumpro.the_app:id/action_bar_root"]'
+    '//android.widget.TextView'
+)
 
 # Photo Demon 화면 내의 image 요소들
 IMAGE_VIEWS = "//android.widget.ScrollView//android.widget.ImageView"
