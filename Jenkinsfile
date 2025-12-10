@@ -145,8 +145,8 @@ pipeline {
                     if errorlevel 1 (
                         echo Appium service not running, starting...
                         net start ${APPIUM_SERVICE}
-                        echo Waiting for Appium to be ready...
-                        timeout /t 5 /nobreak
+                        echo Waiting for Appium to be ready (10 seconds)...
+                        ping 127.0.0.1 -n 11 > nul
                     ) else (
                         echo ✅ Appium service already running
                     )
