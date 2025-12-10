@@ -7,7 +7,7 @@ pipeline {
     
     parameters {
         string(name: 'APK_BUILD_NUMBER', defaultValue: 'latest', description: 'APK Build Number from theapp_deploy')
-        choice(name: 'APK_TYPE', choices: ['release', 'debug'], description: 'APK Type to test')
+        string(name: 'APK_TYPE', defaultValue: 'release', description: 'APK Type (fixed to release)')
     }
     
     environment {
