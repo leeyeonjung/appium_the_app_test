@@ -11,7 +11,6 @@ pipeline {
     }
     
     environment {
-        // Map ANDROID_DEVICES to DEVICES for conftest.py
         DEVICES = "${env.ANDROID_DEVICES}"
         APPIUM_SERVICE = 'AppiumServer1'
         APPIUM_PORT = '4723'
@@ -78,7 +77,6 @@ pipeline {
                 echo '📱 Verifying target device...'
                 bat '''
                     set /p DEVICE_ID=<device_id.txt
-                    echo Device: %DEVICE_ID%
                     adb -s %DEVICE_ID% shell getprop ro.product.model
                     adb -s %DEVICE_ID% shell getprop ro.build.version.release
                 '''
@@ -119,25 +117,20 @@ pipeline {
                 '''
             }
         }
-        
-        stage('Collect Test Results') {
-            steps {
-                echo '📊 Collecting test results...'
-                script {
-                    bat '''
-                        for /f "delims=" %%D in ('powershell -command "(Get-ChildItem -Path Result -Directory -ErrorAction SilentlyContinue | Sort-Object LastWriteTime -Descending | Select-Object -First 1).Name"') do set "LATEST_SESSION=%%D"
-                        if defined LATEST_SESSION (
-                            for /f "delims=" %%H in ('powershell -command "(Get-ChildItem -Path Result\\%LATEST_SESSION% -Filter *.html -ErrorAction SilentlyContinue | Select-Object -First 1).Name"') do set "LATEST_HTML=%%H"
-                            if defined LATEST_HTML copy "Result\\%LATEST_SESSION%\\%LATEST_HTML%" "windows_%LATEST_HTML%"
-                        )
-                    '''
-                }
-            }
-        }
     }
     
     post {
         always {
+            script {
+                bat '''
+                    @echo off
+                    if exist Result (
+                        powershell -Command "& { $session = Get-ChildItem Result -Directory | Sort-Object LastWriteTime -Descending | Select-Object -First 1; if ($session) { $html = Get-ChildItem $session.FullName -Filter *.html | Select-Object -First 1; if ($html) { $target = 'windows_' + $html.Name; Copy-Item $html.FullName $target -Force } } }"
+                    )
+                    exit /b 0
+                '''
+            }
+            
             archiveArtifacts artifacts: 'windows_*.html',
                              allowEmptyArchive: true,
                              fingerprint: true
