@@ -1,4 +1,4 @@
-# src/pages/photo_demo.py
+# src/actions/photo_demo.py
 
 # Standard library
 import logging

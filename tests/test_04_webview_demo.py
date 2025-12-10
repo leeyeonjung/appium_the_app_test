@@ -7,7 +7,7 @@ from time import sleep
 import pytest_check as check
 
 # Local modules
-from src.pages.webview_demo import WebviewDemoPage
+from src.actions.webview_demo import WebviewDemoPage
 
 
 def test_webview_demo_placeholder(wd):

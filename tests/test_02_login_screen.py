@@ -4,7 +4,7 @@
 import pytest_check as check
 
 # Local modules
-from src.pages.login_screen import LoginScreenPage
+from src.actions.login_screen import LoginScreenPage
 
 
 def test_into_login_screen(wd):

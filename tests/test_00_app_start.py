@@ -4,7 +4,7 @@
 import pytest_check as check
 
 # Local modules
-from src.pages.app_start import HomePage
+from src.actions.app_start import HomePage
 
 
 def test_setup(wd):

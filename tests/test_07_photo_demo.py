@@ -10,7 +10,7 @@ from time import sleep
 import pytest_check as check
 
 # Local modules
-from src.pages.photo_demo import PhotoDemoPage
+from src.actions.photo_demo import PhotoDemoPage
 from src.common_util import control_image as control_image
 
 log = logging.getLogger(__name__)

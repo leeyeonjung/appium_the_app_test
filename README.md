@@ -101,7 +101,7 @@ appium_the_app/
 │   │   ├── photo_demo_locaters.py               # Photo Demo locator
 │   │   └── webview_demo_locaters.py             # WebView Demo locator
 │   │
-│   └── pages/                                   # Page Action 정의 (click, input, get)
+│   └── actions/                                 # Page Action 정의 (click, input, get)
 │       ├── app_start.py                         # App Start page object
 │       ├── echo_box.py                          # Echo Box page object
 │       ├── login_screen.py                      # Login Screen page object

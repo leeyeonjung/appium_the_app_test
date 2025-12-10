@@ -1,4 +1,4 @@
-# src/pages/app_start.py
+# src/actions/app_start.py
 
 # Standard library
 import logging

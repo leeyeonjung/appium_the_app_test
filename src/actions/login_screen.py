@@ -1,4 +1,4 @@
-# src/pages/login_screen.py
+# src/actions/login_screen.py
 
 # Standard library
 import logging

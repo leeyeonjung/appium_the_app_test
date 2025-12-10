@@ -1,4 +1,4 @@
-# src/pages/webview_demo.py
+# src/actions/webview_demo.py
 
 # Standard library
 import logging

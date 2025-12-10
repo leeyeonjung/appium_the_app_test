@@ -4,7 +4,7 @@
 import pytest_check as check
 
 # Local modules
-from src.pages.echo_box import EchoBoxPage
+from src.actions.echo_box import EchoBoxPage
 
 
 def test_into_echo_box(wd):

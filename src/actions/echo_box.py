@@ -1,4 +1,4 @@
-# src/pages/echo_box.py
+# src/actions/echo_box.py
 
 # Standard library
 import logging
