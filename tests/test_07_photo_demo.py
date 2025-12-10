@@ -1,17 +1,12 @@
-# tests/test_07_photo_demo.py
-
-# Standard library
 import logging
 import os
 from pathlib import Path
 from time import sleep
 
-# Third-party libraries
 import pytest_check as check
 
-# Local modules
 from src.actions.photo_demo import PhotoDemoPage
-from src.common_util import control_image as control_image
+from src.common_util import control_image
 
 log = logging.getLogger(__name__)
 
@@ -22,21 +17,19 @@ IMAGE_DIR = BASE_DIR / "resources" / "image"
 def test_into_photo_demo(wd):
     """Photo Demo 화면 진입 확인"""
     page = PhotoDemoPage(wd)
-
     page.open_photo_demo()
     title = page.get_title_text()
-
     check.equal(title, "Photo Library. Tap a photo!")
 
 
-def test_photo(wd):
+def test_photo(wd, session_timestamp):
     """표시된 이미지가 원본 이미지와 동일한지 확인"""
     page = PhotoDemoPage(wd)
 
     raw_device_id = wd.capabilities.get("udid") or wd.capabilities.get("deviceUDID") or "unknown_device"
     device_id = str(raw_device_id).replace(":", "_").replace("/", "_").replace("\\", "_")
 
-    save_dir = BASE_DIR / "Result" / "image" / device_id / "test_photo"
+    save_dir = BASE_DIR / "Result" / session_timestamp / "image" / device_id / "test_photo"
     save_dir.mkdir(parents=True, exist_ok=True)
 
     page.open_photo_demo()
@@ -53,7 +46,6 @@ def test_photo(wd):
 
     captured, seen_rects, verified_images = set(), set(), set()
 
-    # 스크롤하며 수집
     for _ in range(6):
         before = len(captured)
         page.capture_visible_square_images(save_dir, seen_rects, captured, use_scroll_view=True)
@@ -67,7 +59,6 @@ def test_photo(wd):
 
     log.info(f"Captured {len(captured)} images in total.")
 
-    # 이미지 유사도 비교 (판정은 테스트에서)
     for ref in expected:
         best_score, best_path = -1, None
         for path in captured:
@@ -85,14 +76,14 @@ def test_photo(wd):
     check.equal(verified_images, expected, f"[VERIFY FAIL] Some images not matched. Found: {verified_images}")
 
 
-def test_image_text(wd):
+def test_image_text(wd, session_timestamp):
     """이미지 클릭 시 표시되는 설명 문구 일치 확인"""
     page = PhotoDemoPage(wd)
 
     raw_device_id = wd.capabilities.get("udid") or wd.capabilities.get("deviceUDID") or "unknown_device"
     device_id = str(raw_device_id).replace(":", "_").replace("/", "_").replace("\\", "_")
 
-    save_dir = BASE_DIR / "Result" / "image" / device_id / "test_image_text"
+    save_dir = BASE_DIR / "Result" / session_timestamp / "image" / device_id / "test_image_text"
     save_dir.mkdir(parents=True, exist_ok=True)
 
     page.open_photo_demo()
@@ -108,13 +99,11 @@ def test_image_text(wd):
     }
 
     expected_images = [str(IMAGE_DIR / name) for name in expected_texts.keys()]
-
     captured, seen_rects = set(), set()
     verified_texts = set()
 
     def capture_and_check():
         nonlocal verified_texts
-        # 현재 뷰의 모든 ImageView 스캔
         elements = page.get_all_image_views()
         log.info(f"[SCAN] Found {len(elements)} ImageViews")
 
@@ -131,12 +120,10 @@ def test_image_text(wd):
             if not (fully_visible and square_like):
                 continue
 
-            # 중복 방지
             for (sx, sy, sw, sh) in seen_rects:
                 if abs(sx - x) < 25 and abs(sy - y) < 25 and abs(sw - w) < 10 and abs(sh - h) < 10:
                     break
             else:
-                # 저장
                 path = save_dir / f"captured_{len(captured) + 1}.png"
                 with open(path, "wb") as f:
                     f.write(el.screenshot_as_png)
@@ -144,7 +131,6 @@ def test_image_text(wd):
                 captured.add(str(path))
                 log.info(f"[SAVE] {path.name} ({w}x{h}) at (x={x}, y={y})")
 
-                # 원본과 매칭
                 screenshot = control_image.open(path).convert("RGB")
                 best_score, matched_ref = -1, None
                 for ref in expected_images:
@@ -163,7 +149,6 @@ def test_image_text(wd):
                 expected_text = expected_texts[matched_name]
                 log.info(f"[MATCH] {path.name} ↔ {matched_name} ({best_score:.2f})")
 
-                # 다이얼로그 텍스트 조회
                 page.tap_element(el)
                 actual = page.get_dialog_text()
                 page.close_dialog_ok()
@@ -172,7 +157,6 @@ def test_image_text(wd):
                 log.info(f"[TEXT PASS] {matched_name}: '{actual}'")
                 verified_texts.add(matched_name)
 
-    # 스크롤 루프
     for _ in range(6):
         before = len(verified_texts)
         capture_and_check()
@@ -181,7 +165,7 @@ def test_image_text(wd):
             break
         page.swipe_up()
         if len(verified_texts) == before:
-            log.info("🔚 No new verifications after swipe. Stopping.")
+            log.info("No new verifications after swipe. Stopping.")
             break
 
     check.equal(len(verified_texts), len(expected_texts),

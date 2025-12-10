@@ -39,13 +39,15 @@ Appium에서 공식 배포하는 샘플 앱 **“The App”** 의 주요 기능�
 - `conftest.py` 파일에서 **Appium 드라이버 관련 fixture를 정의 및 관리**합니다.
 
 ### 3️⃣ **HTML Report & Video Recording**
-- 결과는 `tests/Result/` 하위 폴더에 생성됩니다.  
-  - 📊 **HTML Report** → `tests/Result/test-reports/`  
+- 결과는 `Result/{날짜_시간}/` 형식으로 세션별로 생성됩니다.  
+  - 📊 **HTML Report** → `Result/{날짜_시간}/report.html`  
     - 전체 테스트 결과가 **시각화된 HTML 형태로 저장**됩니다.  
-  - 🎥 **Video Report** → `tests/Result/video-reports/`  
+  - 🎥 **Video Report** → `Result/{날짜_시간}/video-reports/{기기번호}/{테스트파일명}/{테스트함수}.mp4`  
     - 각 테스트 함수의 **실행 과정이 동영상으로 기록**됩니다.  
-  - 🖼️ **Image Report** → `tests/Result/image/`  
+  - 🖼️ **Image Report** → `Result/{날짜_시간}/image/{기기번호}/{테스트함수}/`  
     - 테스트 함수에서 인식한 이미지가 **기기 및 테스트 함수별 PNG 파일로 저장**됩니다.
+    
+**날짜_시간 형식**: `YYYY-MM-DD_HH-MM-SS` (예: `2025-12-10_14-30-45`)
 
 ### 4️⃣ **CI 환경 (Jenkins + AWS + 로컬 테스트 실행)**
 - AWS EC2(Ubuntu)에 **Jenkins를 구축**하여 테스트를 원격 제어하도록 구성했습니다.  
