@@ -156,13 +156,13 @@ pipeline {
                 bat '''
                     @echo off
                     rem Check if service is already running
-                    sc query AppiumServer1 | findstr /C:"RUNNING" >nul 2>&1
+                    sc query AppiumServer1 | findstr /C:"RUNNING" >nul 2^>^&1
                     
                     if errorlevel 1 (
                         echo Appium service not running, starting...
                         net start AppiumServer1
-                        echo Waiting for Appium to be ready (10 seconds)...
-                        ping 127.0.0.1 -n 11 >nul 2>&1
+                        echo Waiting for Appium to be ready...
+                        powershell -command "Start-Sleep -Seconds 10"
                         echo [OK] Appium service started
                     ) else (
                         echo [OK] Appium service already running
