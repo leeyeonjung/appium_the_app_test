@@ -22,7 +22,7 @@ pipeline {
         stage('Checkout Test Code') {
             steps {
                 echo '📥 Checking out test code from GitHub...'
-                checkout scm  // SCM 설정 그대로 사용 (더 간단!)
+                checkout scm
             }
         }
         
@@ -30,10 +30,18 @@ pipeline {
             steps {
                 echo '🐍 Setting up Python virtual environment...'
                 bat '''
-                    if exist %VENV_DIR% rmdir /s /q %VENV_DIR%
-                    python -m venv %VENV_DIR%
-                    call %VENV_DIR%\\Scripts\\activate && python -m pip install --upgrade pip
-                    call %VENV_DIR%\\Scripts\\activate && pip install -r requirements.txt
+                    rem 가상환경이 없으면 생성
+                    if not exist %VENV_DIR% (
+                        echo Creating new virtual environment...
+                        python -m venv %VENV_DIR%
+                    ) else (
+                        echo Using existing virtual environment...
+                    )
+                    
+                    rem 활성화 및 패키지 설치 (이미 있으면 스킵됨)
+                    call %VENV_DIR%\\Scripts\\activate
+                    python -m pip install --upgrade pip
+                    pip install -r requirements.txt
                 '''
             }
         }
@@ -64,16 +72,32 @@ pipeline {
                 script {
                     bat 'if not exist app mkdir app'
                     
-                    copyArtifacts projectName: 'theapp_deploy',
-                                  selector: specific(params.APK_BUILD_NUMBER),
-                                  filter: "android/app/build/outputs/apk/${params.APK_TYPE}/app-${params.APK_TYPE}.apk",
-                                  target: 'app/',
-                                  flatten: true
+                    // latest 또는 특정 빌드 번호 처리
+                    def buildSelector = params.APK_BUILD_NUMBER == 'latest' ? lastSuccessful() : specific(params.APK_BUILD_NUMBER)
+                    
+                    echo "Using selector: ${buildSelector}"
+                    echo "Filter path: android/app/build/outputs/apk/${params.APK_TYPE}/app-${params.APK_TYPE}.apk"
+                    
+                    try {
+                        copyArtifacts projectName: 'theapp_deploy',
+                                      selector: buildSelector,
+                                      filter: "android/app/build/outputs/apk/${params.APK_TYPE}/app-${params.APK_TYPE}.apk",
+                                      target: 'app/',
+                                      flatten: true
+                        echo "✅ APK copied successfully"
+                    } catch (Exception e) {
+                        echo "❌ Failed to copy APK: ${e.message}"
+                        error("Cannot find artifact from theapp_deploy. Please check if theapp_deploy build was successful.")
+                    }
                 }
                 
                 bat '''
                     echo 📱 APK file copied:
                     dir /B app\\*.apk
+                    
+                    echo.
+                    echo File details:
+                    dir app\\*.apk
                 '''
             }
         }
@@ -113,22 +137,24 @@ pipeline {
         
         stage('Start Appium Server') {
             steps {
-                echo '🚀 Starting Appium Server (AppiumServer1)...'
+                echo '🚀 Ensuring Appium Server is running...'
                 bat """
-                    echo Checking service status...
-                    sc query ${APPIUM_SERVICE}
+                    rem Check if service is already running
+                    sc query ${APPIUM_SERVICE} | findstr RUNNING >nul
+                    
+                    if errorlevel 1 (
+                        echo Appium service not running, starting...
+                        net start ${APPIUM_SERVICE}
+                        echo Waiting for Appium to be ready...
+                        timeout /t 5 /nobreak
+                    ) else (
+                        echo ✅ Appium service already running
+                    )
                     
                     echo.
-                    echo Starting Appium service...
-                    net start ${APPIUM_SERVICE}
-                    
-                    echo.
-                    echo Waiting for Appium to be ready...
-                    timeout /t 5 /nobreak
-                    
-                    echo.
-                    echo Verifying Appium is running on port ${APPIUM_PORT}...
+                    echo Verifying Appium on port ${APPIUM_PORT}...
                     netstat -ano | findstr :${APPIUM_PORT}
+                    exit /b 0
                 """
             }
         }
@@ -196,12 +222,16 @@ pipeline {
             
             echo '🛑 Stopping Appium Server...'
             bat """
-                net stop ${APPIUM_SERVICE} 2>nul || echo Appium service already stopped
+                net stop ${APPIUM_SERVICE} 2>nul
+                if errorlevel 1 echo Appium service already stopped
+                exit /b 0
             """
             
             echo '📱 Uninstalling test APK from device...'
             bat '''
-                adb uninstall com.appiumpro.the_app 2>nul || echo App already uninstalled
+                adb uninstall com.appiumpro.the_app 2>nul
+                if errorlevel 1 echo App already uninstalled
+                exit /b 0
             '''
         }
         success {
