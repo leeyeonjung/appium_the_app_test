@@ -30,7 +30,7 @@ pipeline {
             steps {
                 echo '🐍 Setting up Python virtual environment...'
                 bat '''
-                    rem 가상환경이 없으면 생성
+                    rem Create virtual environment if not exists
                     if not exist %VENV_DIR% (
                         echo Creating new virtual environment...
                         python -m venv %VENV_DIR%
@@ -38,7 +38,7 @@ pipeline {
                         echo Using existing virtual environment...
                     )
                     
-                    rem 활성화 및 패키지 설치 (이미 있으면 스킵됨)
+                    rem Activate venv and install packages
                     call %VENV_DIR%\\Scripts\\activate
                     python -m pip install --upgrade pip
                     pip install -r requirements.txt
@@ -62,6 +62,16 @@ pipeline {
                     echo.
                     echo ADB version:
                     adb --version
+                    echo.
+                    
+                    rem Extract DEVICE_ID from DEVICES JSON
+                    echo Extracting device ID from DEVICES...
+                    python -c "import json, os; devices = json.loads(os.getenv('DEVICES', '[]')); print(devices[0]['udid'] if devices else 'emulator-5554', end='')" > device_id.txt
+                    
+                    rem Verify device_id.txt content
+                    echo Device ID file content:
+                    type device_id.txt
+                    echo.
                 '''
             }
         }
@@ -72,7 +82,7 @@ pipeline {
                 script {
                     bat 'if not exist app mkdir app'
                     
-                    // latest 또는 특정 빌드 번호 처리
+                    // Handle 'latest' or specific build number
                     def buildSelector = params.APK_BUILD_NUMBER == 'latest' ? lastSuccessful() : specific(params.APK_BUILD_NUMBER)
                     
                     echo "Using selector: ${buildSelector}"
@@ -92,7 +102,7 @@ pipeline {
                 }
                 
                 bat '''
-                    echo 📱 APK file copied:
+                    echo [OK] APK file copied:
                     dir /B app\\*.apk
                     
                     echo.
@@ -102,17 +112,18 @@ pipeline {
             }
         }
         
-        stage('Check Connected Devices') {
+        stage('Verify Device Configuration') {
             steps {
-                echo '📱 Checking connected Android devices...'
+                echo '📱 Verifying target device...'
                 bat '''
-                    echo Connected devices:
-                    adb devices -l
-                    
+                    rem Read device ID from Jenkins environment variable
+                    set /p DEVICE_ID=<device_id.txt
+                    echo Target Device: %DEVICE_ID%
                     echo.
+                    
                     echo Device information:
-                    adb shell getprop ro.product.model
-                    adb shell getprop ro.build.version.release
+                    adb -s %DEVICE_ID% shell getprop ro.product.model
+                    adb -s %DEVICE_ID% shell getprop ro.build.version.release
                 '''
             }
         }
@@ -121,16 +132,20 @@ pipeline {
             steps {
                 echo '📲 Installing APK on device...'
                 bat """
+                    rem Read device ID from file
+                    set /p DEVICE_ID=<device_id.txt
+                    echo Target device: %DEVICE_ID%
+                    echo.
                     echo Uninstalling previous version (if exists)...
-                    adb uninstall com.appiumpro.the_app 2>nul || echo No previous installation found
+                    adb -s %DEVICE_ID% uninstall com.appiumpro.the_app 2>nul || echo No previous installation found
                     
                     echo.
                     echo Installing app-${params.APK_TYPE}.apk...
-                    adb install -r app\\app-${params.APK_TYPE}.apk
+                    adb -s %DEVICE_ID% install -r app\\app-${params.APK_TYPE}.apk
                     
                     echo.
                     echo Verifying installation...
-                    adb shell pm list packages | findstr appiumpro
+                    adb -s %DEVICE_ID% shell pm list packages | findstr appiumpro
                 """
             }
         }
@@ -138,24 +153,21 @@ pipeline {
         stage('Start Appium Server') {
             steps {
                 echo '🚀 Ensuring Appium Server is running...'
-                bat """
+                bat '''
+                    @echo off
                     rem Check if service is already running
-                    sc query ${APPIUM_SERVICE} | findstr RUNNING >nul
+                    sc query AppiumServer1 | findstr /C:"RUNNING" >nul 2>&1
                     
                     if errorlevel 1 (
                         echo Appium service not running, starting...
-                        net start ${APPIUM_SERVICE}
+                        net start AppiumServer1
                         echo Waiting for Appium to be ready (10 seconds)...
-                        ping 127.0.0.1 -n 11 > nul
+                        ping 127.0.0.1 -n 11 >nul 2>&1
+                        echo [OK] Appium service started
                     ) else (
-                        echo ✅ Appium service already running
+                        echo [OK] Appium service already running
                     )
-                    
-                    echo.
-                    echo Verifying Appium on port ${APPIUM_PORT}...
-                    netstat -ano | findstr :${APPIUM_PORT}
-                    exit /b 0
-                """
+                '''
             }
         }
         
@@ -174,7 +186,7 @@ pipeline {
                 echo '📊 Collecting test results...'
                 script {
                     bat '''
-                        echo 📝 Finding latest test session...
+                        echo [INFO] Finding latest test session...
                         
                         rem Find latest session folder (by date)
                         for /f "delims=" %%D in ('dir /b /o-d /ad Result\\* 2^>nul') do (
@@ -184,7 +196,7 @@ pipeline {
                         :session_found
                         
                         if defined LATEST_SESSION (
-                            echo ✅ Latest session: %LATEST_SESSION%
+                            echo [OK] Latest session: %LATEST_SESSION%
                             
                             rem Find HTML report in the session folder
                             if exist Result\\%LATEST_SESSION%\\*.html (
@@ -195,15 +207,15 @@ pipeline {
                                 :html_found
                                 
                                 if defined LATEST_HTML (
-                                    echo 📄 Report file: %LATEST_HTML%
+                                    echo [OK] Report file: %LATEST_HTML%
                                     copy "Result\\%LATEST_SESSION%\\%LATEST_HTML%" "windows_%LATEST_HTML%"
-                                    echo ✅ Copied to: windows_%LATEST_HTML%
+                                    echo [OK] Copied to: windows_%LATEST_HTML%
                                 )
                             ) else (
-                                echo ⚠️ No HTML report found in session folder
+                                echo [WARNING] No HTML report found in session folder
                             )
                         ) else (
-                            echo ⚠️ No test session folders found
+                            echo [WARNING] No test session folders found
                         )
                     '''
                 }
@@ -221,15 +233,20 @@ pipeline {
                              fingerprint: true
             
             echo '🛑 Stopping Appium Server...'
-            bat """
-                net stop ${APPIUM_SERVICE} 2>nul
+            bat '''
+                net stop AppiumServer1 2>nul
                 if errorlevel 1 echo Appium service already stopped
                 exit /b 0
-            """
+            '''
             
             echo '📱 Uninstalling test APK from device...'
             bat '''
-                adb uninstall com.appiumpro.the_app 2>nul
+                if exist device_id.txt (
+                    set /p DEVICE_ID=<device_id.txt
+                    adb -s %DEVICE_ID% uninstall com.appiumpro.the_app 2>nul
+                ) else (
+                    adb uninstall com.appiumpro.the_app 2>nul
+                )
                 if errorlevel 1 echo App already uninstalled
                 exit /b 0
             '''
