@@ -8,7 +8,7 @@ __pycache__/
 .pytest_cache/
 
 # .env 파일
-/tests/.env  
+.env
 
 # 최초 upload를 제외한 APK push하지 않음
 *.apk
