@@ -86,48 +86,40 @@ appium_the_app/
 ├── testcase_excel/
 │   └── (Testcase)The_App.xlsm                   # 테스트 케이스 관리용 Excel 문서
 │
-├── tests/
-│   ├── conftest.py                              # pytest 전역 설정 및 driver fixture 정의
-│   │
+├── resources/
+│   └── image/                                   # baseline 이미지 저장 경로
+│       ├── original_1.png ~ original_6.png
+│
+├── src/                                         # 소스 코드 루트
 │   ├── common_util/                             # 공통 유틸리티 모듈
 │   │   └── control_image.py                     # SSIM 기반 이미지 비교 유틸리티
 │   │
-│   ├── image/                                   # baseline 이미지 저장 경로
-│   │   ├── original_1.png ~ original_6.png
+│   ├── locaters/                                # 요소 Locators 정의
+│   │   ├── app_start_locaters.py                # App Start 화면 locator
+│   │   ├── echo_box_locaters.py                 # Echo Box 화면 locator
+│   │   ├── login_screen_locaters.py             # Login Screen locator
+│   │   ├── photo_demo_locaters.py               # Photo Demo locator
+│   │   └── webview_demo_locaters.py             # WebView Demo locator
 │   │
-│   ├── src/                                     
-│   │   ├── locaters/                            # 요소 Locators 정의
-│   │   │   ├── app_start_locaters.py            # App Start 화면 locator
-│   │   │   ├── echo_box_locaters.py             # Echo Box 화면 locator
-│   │   │   ├── login_screen_locaters.py         # Login Screen locator
-│   │   │   ├── photo_demo_locaters.py           # Photo Demo locator
-│   │   │   └── webview_demo_locaters.py         # WebView Demo locator
-│   │   │
-│   │   ├── pages/                               # Page Action 정의 (click, input, get)
-│   │   │   ├── app_start.py                     # App Start page object
-│   │   │   ├── echo_box.py                      # Echo Box page object
-│   │   │   ├── login_screen.py                  # Login Screen page object
-│   │   │   ├── photo_demo.py                    # Photo Demo page object
-│   │   │   └── webview_demo.py                  # WebView Demo page object
-│   │   │
-│   │   └── testcase/                            # 실제 테스트 시나리오 및 검증 로직
-│   │       ├── test_0_app_start.py              # 앱 실행 및 초기 화면 진입 테스트
-│   │       ├── test_1_echo_box.py               # Echo Box 입력 및 출력 검증
-│   │       ├── test_2_login_screen.py           # 로그인 화면 검증
-│   │       ├── test_4_webview_demo.py           # WebView 페이지 테스트
-│   │       └── test_7_photo_demo.py             # Photo Demo 이미지 비교 테스트
-│   │
-│   ├── Results/                                 # 테스트 실행 결과 저장 폴더
-│   │   ├── image/                               # 캡처 이미지 저장
-│   │   ├── test-reports/                        # pytest HTML 리포트
-│   │   └── video-reports/                       # 테스트 실행 녹화 영상
-│   │
+│   └── pages/                                   # Page Action 정의 (click, input, get)
+│       ├── app_start.py                         # App Start page object
+│       ├── echo_box.py                          # Echo Box page object
+│       ├── login_screen.py                      # Login Screen page object
+│       ├── photo_demo.py                        # Photo Demo page object
+│       └── webview_demo.py                      # WebView Demo page object
+│
+├── tests/                                       # 테스트 시나리오 및 검증 로직
+│   ├── test_0_app_start.py                      # 앱 실행 및 초기 화면 진입 테스트
+│   ├── test_1_echo_box.py                       # Echo Box 입력 및 출력 검증
+│   ├── test_2_login_screen.py                   # 로그인 화면 검증
+│   ├── test_4_webview_demo.py                   # WebView 페이지 테스트
+│   ├── test_7_photo_demo.py                     # Photo Demo 이미지 비교 테스트
 │   └── __init__.py                              # tests 패키지 인식용
 │
+├── conftest.py                                  # pytest 전역 설정 및 driver fixture 정의
 ├── requirements.txt                             # Python 의존성 패키지 목록
-│
+├── .env.example                                 # 환경 변수 템플릿
 ├── Jenkinsfile                                  # Jenkins 파이프라인 정의
-│
 └── README.md                                    # 프로젝트 개요 및 실행 가이드
 ```
 
@@ -180,17 +172,16 @@ pip install -r requirements.txt
 ```
 
 ### 1️⃣-1️⃣ Device Configuration (.env 파일 설정)
-테스트에 사용할 기기(device) 설정은 `tests/.env` 파일에서 관리합니다.
+테스트에 사용할 기기(device) 설정은 `.env` 파일에서 관리합니다.
 
 #### 📝 .env 파일 생성
 ```bash
 # .env.example 파일을 .env로 복사
-cd tests
 cp .env.example .env
 ```
 
 #### 🔧 Device 설정 방법
-`tests/.env` 파일에서 `DEVICES` 환경변수를 JSON 배열 형식으로 설정합니다.
+`.env` 파일에서 `DEVICES` 환경변수를 JSON 배열 형식으로 설정합니다.
 
 **예시 1: 단일 기기 사용**
 ```env
