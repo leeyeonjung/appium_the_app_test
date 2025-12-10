@@ -3,7 +3,6 @@ numpy==2.3.3
 pillow==11.3.0
 pytest==8.4.2
 pytest-check==2.4.2
-pytest-xdist==3.8.0
 selenium==4.35.0
 scikit-image==0.25.2
 python-dotenv==1.2.1
