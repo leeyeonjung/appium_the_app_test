@@ -5,6 +5,7 @@ from time import sleep
 
 import pytest_check as check
 
+from conftest import SESSION_TIMESTAMP
 from src.actions.photo_demo import PhotoDemoPage
 from src.common_util import control_image
 
@@ -22,14 +23,14 @@ def test_into_photo_demo(wd):
     check.equal(title, "Photo Library. Tap a photo!")
 
 
-def test_photo(wd, session_timestamp):
+def test_photo(wd):
     """표시된 이미지가 원본 이미지와 동일한지 확인"""
     page = PhotoDemoPage(wd)
 
     raw_device_id = wd.capabilities.get("udid") or wd.capabilities.get("deviceUDID") or "unknown_device"
     device_id = str(raw_device_id).replace(":", "_").replace("/", "_").replace("\\", "_")
 
-    save_dir = BASE_DIR / "Result" / session_timestamp / "image" / device_id / "test_photo"
+    save_dir = BASE_DIR / "Result" / SESSION_TIMESTAMP / "image" / device_id / "test_photo"
     save_dir.mkdir(parents=True, exist_ok=True)
 
     page.open_photo_demo()
@@ -76,14 +77,14 @@ def test_photo(wd, session_timestamp):
     check.equal(verified_images, expected, f"[VERIFY FAIL] Some images not matched. Found: {verified_images}")
 
 
-def test_image_text(wd, session_timestamp):
+def test_image_text(wd):
     """이미지 클릭 시 표시되는 설명 문구 일치 확인"""
     page = PhotoDemoPage(wd)
 
     raw_device_id = wd.capabilities.get("udid") or wd.capabilities.get("deviceUDID") or "unknown_device"
     device_id = str(raw_device_id).replace(":", "_").replace("/", "_").replace("\\", "_")
 
-    save_dir = BASE_DIR / "Result" / session_timestamp / "image" / device_id / "test_image_text"
+    save_dir = BASE_DIR / "Result" / SESSION_TIMESTAMP / "image" / device_id / "test_image_text"
     save_dir.mkdir(parents=True, exist_ok=True)
 
     page.open_photo_demo()

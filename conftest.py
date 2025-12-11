@@ -18,11 +18,6 @@ env_loader.load_env_files()
 SESSION_TIMESTAMP = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
 
 
-@pytest.fixture(scope="session")
-def session_timestamp():
-    return SESSION_TIMESTAMP
-
-
 def load_devices_from_env():
     devices_json = env_loader.getenv("DEVICES", "[]")
     devices_list = json.loads(devices_json)
