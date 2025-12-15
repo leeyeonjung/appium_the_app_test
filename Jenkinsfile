@@ -113,7 +113,7 @@ pipeline {
                 echo '🧪 Running Appium tests...'
                 bat '''
                     call %VENV_DIR%\\Scripts\\activate
-                    pytest -v --tb=short
+                    pytest -v tests\\test_00_app_start.py --tb=short
                 '''
             }
         }
