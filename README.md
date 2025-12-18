@@ -29,7 +29,7 @@ UI 변경에 강한 테스트 코드를 구성하였으며,
 - [🗂 프로젝트 구조](#-프로젝트-구조)
 - [🏗 테스트 코드 설계 (POM)](#-테스트-코드-설계-pom)
 - [🚀 Jenkins 파이프라인 구성](#-jenkins-파이프라인-구성)
-- [📊 테스트 리포트](#-테스트-리포트)
+- [📊 테스트 산출물](#-테스트-산출물)
 - [🔗 참고 링크](#-참고-링크)
 
 ---
@@ -167,11 +167,10 @@ POM 구조를 적용하여 UI 변경에 강한 테스트 코드 구조를 유지
 ## 📊 테스트 산출물
 - [Example Link](https://github.com/leeyeonjung/appium_the_app_test/tree/main/Result)
 
-- 저장 위치  
-  `Result/{YYYY-MM-DD_HH-MM-SS}/`
- - HTML 리포트
- - 실행 로그
- - 테스트별 동영상
+- 저장 위치 `Result/{YYYY-MM-DD_HH-MM-SS}/`
+  - HTML 리포트
+  - 실행 로그
+  - 테스트별 동영상
 
 ---
 
