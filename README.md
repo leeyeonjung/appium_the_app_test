@@ -1,10 +1,10 @@
-# The App Test Automation
+# Mobile Test Automation (The App)
 
- 프로젝트는 Android 애플리케이션 모바일 QA 테스트 자동화 프로젝트입니다.
+본 프로젝트는 Android 애플리케이션 모바일 QA 테스트 자동화 프로젝트입니다.
 
 Appium + Pytest 기반의 Page Object Model(POM) 구조를 적용하여  
 UI 변경에 강한 테스트 코드를 구성하였으며,  
-실제 Android Emulator 및 Physical Device 환경에서 테스트를 수행합니다.
+환경변수에 따른 Device 환경에서 테스트를 수행합니다.
 
 각 테스트 실행 결과는 HTML 리포트, 동영상, 이미지 비교 결과로 자동 기록되어  
 기능 검증과 이슈 재현, 디버깅에 활용할 수 있도록 설계되었습니다.
